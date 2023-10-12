@@ -7,8 +7,8 @@ from foodgram.constants import (DEFAULT_COLOR,
                                 DIRICTORY_PATH,
                                 MIN_INGREDIENT,
                                 TIME_MIN_COOK,
-                                MAX_TIME_COOK
-)
+                                MAX_TIME_COOK,
+                                MAX_INGREDIENT)
 
 User = get_user_model()
 
@@ -118,10 +118,8 @@ class Recipe(models.Model):
         'Время приготовления, мин',
         default=1,
         validators=[
-            MinValueValidator(1,
-                              message=TIME_MIN_COOK),
-            MaxValueValidator(360,
-                              message=MAX_TIME_COOK),
+            MinValueValidator(1,message=TIME_MIN_COOK),
+            MaxValueValidator(360,message=MAX_TIME_COOK),
         ],
     )
     author = models.ForeignKey(

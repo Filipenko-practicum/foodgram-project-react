@@ -118,8 +118,8 @@ class Recipe(models.Model):
         'Время приготовления, мин',
         default=1,
         validators=[
-            MinValueValidator(1,message=TIME_MIN_COOK),
-            MaxValueValidator(360,message=MAX_TIME_COOK),
+            MinValueValidator(1, message=TIME_MIN_COOK),
+            MaxValueValidator(360, message=MAX_TIME_COOK),
         ],
     )
     author = models.ForeignKey(
@@ -163,7 +163,7 @@ class RecipeIngredient(models.Model):
         default=1,
         validators=[
             MinValueValidator(1, message=MIN_INGREDIENT),
-            MaxValueValidator(1000,message=MAX_INGREDIENT),
+            MaxValueValidator(1000, message=MAX_INGREDIENT),
         ],
     )
 

@@ -210,35 +210,6 @@ class RecipeCreateSerializer(ModelSerializer):
         return RecipeListSerializer(instance, context=self.context).data
 
 
-class AddSubscribedSerializer(ModelSerializer):
-    """Сериалайзер подписчика"""
-    class Meta:
-        model = Subscribed
-        fields = ('user', 'author')
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Subscribed.objects.all(),
-                fields=['user', 'author'],
-                message='Нельзя подписаться на самого себя!',
-            )
-        ]
-
-    def validate(self, attrs):
-        user = attrs.get('user')
-        author = attrs.get('author')
-
-        if user == author:
-            raise ValidationError('Нельзя подписаться на самого себя!')
-
-        return attrs
-
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        return SubscribedSerializer(
-            instance.author, context={'request': request}
-        ).data
-
-
 class SubscribedSerializer(UserSerializer):
     """Сереалайзер Подписок. для GET запроса"""
 

@@ -2,7 +2,13 @@ from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from foodgram.constants import DEFAULT_COLOR, INGREDIENT_UNITS, DIRICTORY_PATH
+from foodgram.constants import (DEFAULT_COLOR,
+                                INGREDIENT_UNITS,
+                                DIRICTORY_PATH,
+                                MIN_INGREDIENT,
+                                TIME_MIN_COOK,
+                                MAX_TIME_COOK
+)
 
 User = get_user_model()
 
@@ -113,11 +119,9 @@ class Recipe(models.Model):
         default=1,
         validators=[
             MinValueValidator(1,
-                              message=
-                              'Время приготовления не может быть меньше 1'),
+                              message=TIME_MIN_COOK),
             MaxValueValidator(360,
-                              message=
-                              'Время приготовления не может быть больше 360'),
+                              message=MAX_TIME_COOK),
         ],
     )
     author = models.ForeignKey(
@@ -160,12 +164,8 @@ class RecipeIngredient(models.Model):
         'Количество',
         default=1,
         validators=[
-            MinValueValidator(1,
-                              message=
-                              'Количество ингредиентов не может быть 0'),
-            MaxValueValidator(1000,
-                              message=
-                              'Количество ингредиентов не может быть больше 1000'),
+            MinValueValidator(1, message=MIN_INGREDIENT),
+            MaxValueValidator(1000,message=MAX_INGREDIENT),
         ],
     )
 

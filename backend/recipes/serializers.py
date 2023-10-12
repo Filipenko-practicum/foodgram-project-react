@@ -144,7 +144,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
 
 class RecipeCreateSerializer(ModelSerializer):
     """Serializer для модели Recipe - запись / обновление / удаление данных."""
-    
+
     tags = PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all())
     cooking_time = IntegerField(min_value=1, max_value=1000)
     ingredients = HowIngredientSerilizer(many=True)
@@ -186,7 +186,7 @@ class RecipeCreateSerializer(ModelSerializer):
             raise ValidationError('Тэги не должны повторяться.')
 
         return data
-    
+
     def create(self, validated_data):
         """Создание рецепта."""
 
@@ -210,7 +210,7 @@ class RecipeCreateSerializer(ModelSerializer):
         return RecipeListSerializer(instance, context=self.context).data
 
 
-class SubscribedSerializer(ModelSerializer):
+class AddSubscribedSerializer(ModelSerializer):
     """Сериалайзер подписчика"""
     class Meta:
         model = Subscribed

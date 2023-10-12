@@ -123,4 +123,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
             .order_by('ingredient__name')
             .annotate(amount=Sum('amount'))
         )
-        return self.create_shopping_cart_file(self, request, ingredients) 
+        return self.create_shopping_cart_file(self, request, ingredients)

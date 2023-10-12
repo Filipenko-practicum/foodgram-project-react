@@ -6,10 +6,10 @@ from .models import User
 class UserSerializer(serializers.ModelSerializer):
     """Сериалайзер Юзера."""
     is_subscribed = serializers.SerializerMethodField(read_only=True)
-    
+
     class Meta:
-        model=User
-        fields= (
+        model = User
+        fields = (
             'email',
             'id',
             'username',
@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        user=self.context.get('request').user
+        user = self.context.get('request').user
         return bool(
             user.is_authenticated
             and obj.subscribing.filter(user=user).exists()

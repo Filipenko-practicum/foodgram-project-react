@@ -113,9 +113,11 @@ class Recipe(models.Model):
         default=1,
         validators=[
             MinValueValidator(1,
-                             message='Время приготовления не может быть > 1'),
+                              message=
+                              'Время приготовления не может быть меньше 1'),
             MaxValueValidator(360,
-                             message='Время приготовления не может быть < 360'),
+                              message=
+                              'Время приготовления не может быть больше 360'),
         ],
     )
     author = models.ForeignKey(
@@ -159,9 +161,11 @@ class RecipeIngredient(models.Model):
         default=1,
         validators=[
             MinValueValidator(1,
-                              message='Количество ингредиентов не может быть 0'),
+                              message=
+                              'Количество ингредиентов не может быть 0'),
             MaxValueValidator(1000,
-                              message='Количество ингредиентов не может быть больше 1000'),
+                              message=
+                              'Количество ингредиентов не может быть больше 1000'),
         ],
     )
 

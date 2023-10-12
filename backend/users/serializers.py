@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .models import User
 
+
 class UserSerializer(serializers.ModelSerializer):
     """Сериалайзер Юзера."""
     is_subscribed = serializers.SerializerMethodField(read_only=True)

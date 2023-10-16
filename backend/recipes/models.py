@@ -1,16 +1,18 @@
 from colorfield.fields import ColorField
-from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from foodgram.constants import (DEFAULT_COLOR,
-                                INGREDIENT_UNITS,
-                                DIRICTORY_PATH,
-                                MIN_INGREDIENT,
-                                TIME_MIN_COOK,
-                                MAX_TIME_COOK,
-                                MAX_INGREDIENT)
 
-User = get_user_model()
+from foodgram.constants import (DEFAULT_COLOR, DIRICTORY_PATH,
+                                INGREDIENT_UNITS, MAX_INGREDIENT,
+                                MAX_TIME_COOK, MIN_INGREDIENT, MIN_TIME_COOK)
+from users.models import User
+
+
+class ImportIngredient(models.Model):
+    """Модель импорта ингридиентов."""
+
+    csv_file = models.FileField(upload_to='uploads/')
+    date_added = models.DateTimeField(auto_now_add=True)
 
 
 class Tag(models.Model):
@@ -118,7 +120,7 @@ class Recipe(models.Model):
         'Время приготовления, мин',
         default=1,
         validators=[
-            MinValueValidator(1, message=TIME_MIN_COOK),
+            MinValueValidator(1, message=MIN_TIME_COOK),
             MaxValueValidator(360, message=MAX_TIME_COOK),
         ],
     )

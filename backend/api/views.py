@@ -1,16 +1,20 @@
+from datetime import datetime as dt
+
 from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import response, status
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+
+from foodgram.constants import FILE_NAME
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingСart, Tag)
 from recipes.serializers import (FavoriteSerializer, IngredienSerializer,
                                  RecipeCreateSerializer, RecipeListSerializer,
                                  ShoppingCartSerializer, TagSerializer)
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
-from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.viewsets import ReadOnlyModelViewSet
 from users.pagination import LimitPageNumberPagination
 
 from .filters import IngredientSearchFilter, RecipeFilter
@@ -37,82 +41,95 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     filterset_class = IngredientSearchFilter
 
 
-class RecipeViewSet(viewsets.ModelViewSet):
-    """Вьюсет модели Recipe: [GET, POST, DELETE, PATCH]."""
+class RecipeViewSet(ModelViewSet):
+    """Вью сет для рецептов."""
+
     queryset = Recipe.objects.all()
-    permission_classes = (IsOwnerOrAdminOrReadOnly, )
-    filter_backends = (DjangoFilterBackend, )
-    pagination_class = LimitPageNumberPagination
+    permission_classes = (IsOwnerOrAdminOrReadOnly,)
+    filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
+    pagination_class = LimitPageNumberPagination
 
     def get_serializer_class(self):
-        if self.request.method in SAFE_METHODS:
+        """Метод определения сереолайзера"""
+
+        if self.action in ('list', 'retrieve'):
             return RecipeListSerializer
         return RecipeCreateSerializer
 
-    @action(detail=True,
-            methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated])
-    def favorite(self, request, *args, **kwargs):
-        """
-        Получить / Добавить / Удалить  рецепт
-        из избранного у текущего пользоватля.
-        """
-        recipe = get_object_or_404(Recipe, id=self.kwargs.get('pk'))
-        user = self.request.user
-        if request.method == 'POST':
-            if Favorite.objects.filter(author=user,
-                                       recipe=recipe).exists():
-                return Response({'errors': 'Рецепт уже добавлен!'},
-                                status=status.HTTP_400_BAD_REQUEST)
-            serializer = FavoriteSerializer(data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save(author=user, recipe=recipe)
-                return Response(serializer.data,
-                                status=status.HTTP_201_CREATED)
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-        if not Favorite.objects.filter(author=user,
-                                       recipe=recipe).exists():
-            return Response({'errors': 'Объект не найден'},
-                            status=status.HTTP_404_NOT_FOUND)
-        Favorite.objects.get(recipe=recipe).delete()
-        return Response('Рецепт успешно удалён из избранного.',
-                        status=status.HTTP_204_NO_CONTENT)
+    @staticmethod
+    def adding_recipe(add_serializer, model, request, recipe_id):
+        """Кастомный метод добавления и удаления рецепта."""
+        user = request.user
+        data = {'user': user.id, 'recipe': recipe_id}
+        serializer = add_serializer(data=data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return response.Response(
+            serializer.data, status=status.HTTP_201_CREATED
+        )
 
-    @action(detail=True,
-            methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated])
-    def shopping_cart(self, request, **kwargs):
-        """
-        Получить / Добавить / Удалить  рецепт
-        из списка покупок у текущего пользоватля.
-        """
-        recipe = get_object_or_404(Recipe, id=self.kwargs.get('pk'))
+    @staticmethod
+    def create_shopping_cart_file(self, request, ingredients):
+        """Кастомный метод создания списка. покупок"""
         user = self.request.user
-        if request.method == 'POST':
-            if ShoppingСart.objects.filter(author=user,
-                                           recipe=recipe).exists():
-                return Response({'errors': 'Рецепт уже добавлен!'},
-                                status=status.HTTP_400_BAD_REQUEST)
-            serializer = ShoppingCartSerializer(data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save(author=user, recipe=recipe)
-                return Response(serializer.data,
-                                status=status.HTTP_201_CREATED)
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-        if not ShoppingСart.objects.filter(author=user,
-                                           recipe=recipe).exists():
-            return Response({'errors': 'Объект не найден'},
-                            status=status.HTTP_404_NOT_FOUND)
-        ShoppingСart.objects.get(recipe=recipe).delete()
-        return Response('Рецепт успешно удалён из списка покупок.',
-                        status=status.HTTP_204_NO_CONTENT)
+        filename = f'{user.username}_{FILE_NAME}'
+        today = dt.today()
+        shopping_list = (
+            f'Список покупок для пользователя: {user.username}\n\n'
+            f'Дата: {today:%Y-%m-%d}\n\n'
+        )
+        shopping_list += '\n'.join(
+            [
+                f'- {ingredient["ingredient__name"]} '
+                f'({ingredient["ingredient__measurement_unit"]})'
+                f' - {ingredient["amount"]}'
+                for ingredient in ingredients
+            ]
+        )
+        shopping_list += f'\n\nFoodgram ({today:%Y})'
+        response = HttpResponse(
+            shopping_list, content_type='text.txt; charset=utf-8'
+        )
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        return response
 
-    @action(detail=False,
-            methods=['get'],
-            permission_classes=[IsAuthenticated])
+    @action(
+        detail=True, methods=['post'], permission_classes=(IsAuthenticated,)
+    )
+    def favorite(self, request, pk):
+        return self.adding_recipe(FavoriteSerializer, Favorite, request, pk)
+
+    @favorite.mapping.delete
+    def remove_from_favorite(self, request, pk):
+        """Метод удаления избраного"""
+        get_object_or_404(Favorite, user=request.user, recipe=pk).delete()
+        return response.Response(
+            {'detail': 'Рецепт удалён'},
+            status=status.HTTP_204_NO_CONTENT,
+        )
+
+    @action(
+        detail=True,
+        methods=['post'],
+        permission_classes=(IsAuthenticated,),
+        pagination_class=None,
+    )
+    def shopping_cart(self, request, pk):
+        """Метод добавления рецепта в корзину"""
+        return self.adding_recipe(
+            ShoppingCartSerializer, ShoppingСart, request, pk
+        )
+
+    @shopping_cart.mapping.delete
+    def remove_from_shopping_cart(self, request, pk):
+        """Метод удаления из корзины"""
+        get_object_or_404(ShoppingСart, user=request.user, recipe=pk).delete()
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        detail=False, methods=['get'], permission_classes=(IsAuthenticated,)
+    )
     def download_shopping_cart(self, request):
         """Метод получения списка покупок"""
         ingredients = (

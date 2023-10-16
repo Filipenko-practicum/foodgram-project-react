@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from recipes.serializers import AddSubscribedSerializer, SubscribedSerializer
 from rest_framework import response, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from recipes.serializers import AddSubscribedSerializer, SubscribedSerializer
 from users.pagination import LimitPageNumberPagination
 
 from .models import Subscribed, User

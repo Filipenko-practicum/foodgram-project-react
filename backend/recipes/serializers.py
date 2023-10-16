@@ -5,6 +5,7 @@ from rest_framework.serializers import (IntegerField, ModelSerializer,
                                         PrimaryKeyRelatedField, ReadOnlyField,
                                         SerializerMethodField)
 from rest_framework.validators import UniqueTogetherValidator
+
 from users.models import Subscribed
 from users.serializers import UserSerializer
 
@@ -53,43 +54,45 @@ class RecipeIngredientSerializer(ModelSerializer):
 
 
 class FavoriteSerializer(ModelSerializer):
-    """Сериалайзер модели Favorite."""
-    name = serializers.ReadOnlyField(
-        source='recipe.name',
-        read_only=True)
-    image = serializers.ImageField(
-        source='recipe.image',
-        read_only=True)
-    coocking_time = serializers.IntegerField(
-        source='recipe.cooking_time',
-        read_only=True)
-    id = serializers.PrimaryKeyRelatedField(
-        source='recipe',
-        read_only=True)
+    """Сереалайзер избранного"""
 
     class Meta:
         model = Favorite
-        fields = ('id', 'name', 'image', 'coocking_time')
+        fields = ('user', 'recipe')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=['user', 'recipe'],
+                message='иди в очко',
+            )
+        ]
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        return RecipeSerializer(
+            instance.recipe, context={'request': request}
+        ).data
 
 
 class ShoppingCartSerializer(ModelSerializer):
     """Сериалайзер модели Cart."""
-    name = serializers.ReadOnlyField(
-        source='recipe.name',
-        read_only=True)
-    image = serializers.ImageField(
-        source='recipe.image',
-        read_only=True)
-    coocking_time = serializers.IntegerField(
-        source='recipe.cooking_time',
-        read_only=True)
-    id = serializers.PrimaryKeyRelatedField(
-        source='recipe',
-        read_only=True)
 
     class Meta:
         model = ShoppingСart
-        fields = ('id', 'name', 'image', 'coocking_time')
+        fields = ('user', 'recipe')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ShoppingСart.objects.all(),
+                fields=['user', 'recipe'],
+                message='Добавлен уже в корзину!',
+            )
+        ]
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        return RecipeSerializer(
+            instance.recipe, context={'request': request}
+        ).data
 
 
 class HowIngredientSerilizer(ModelSerializer):
@@ -186,6 +189,20 @@ class RecipeCreateSerializer(ModelSerializer):
             raise ValidationError('Тэги не должны повторяться.')
 
         return data
+
+    @staticmethod
+    def create_recipe_ingredients(recipe, ingredients_data):
+        recipe.ingredients.clear()
+        recipe_ingredients = []
+        for ingredient_data in ingredients_data:
+            ingredient_id = ingredient_data['id']
+            amount = ingredient_data['amount']
+            recipe_ingredients.append(
+                RecipeIngredient(
+                    recipe=recipe, ingredient_id=ingredient_id, amount=amount
+                )
+            )
+        RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
     def create(self, validated_data):
         """Создание рецепта."""

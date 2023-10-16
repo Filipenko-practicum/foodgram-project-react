@@ -85,13 +85,6 @@ class Ingredient(models.Model):
         return f'{self.name},в {self.measurement_unit}'
 
 
-class ImportIngredient(models.Model):
-    """Модель импорта ингридиентов."""
-
-    csv_file = models.FileField(upload_to='uploads/')
-    date_added = models.DateTimeField(auto_now_add=True)
-
-
 class Recipe(models.Model):
     """Модель рецептов."""
 

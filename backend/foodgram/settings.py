@@ -102,7 +102,7 @@ else:
             'USER': os.getenv('POSTGRES_USER', 'foodgram'),
             'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
             'HOST': os.getenv('DB_HOST', ''),
-            'PORT': os.getenv('DB_PORT', 5432),
+            'PORT': os.getenv('DB_PORT', 5432)
         }
     }
 # Password validation

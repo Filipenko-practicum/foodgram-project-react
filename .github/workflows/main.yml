@@ -118,7 +118,7 @@ jobs:
       - name: Push to DockerHub
         uses: docker/build-push-action@v4
         with:
-          context: ./nginx/
+          context: "infra/docker-compose.production.yml, infra/nginx.conf"
           push: true
           tags: ${{ secrets.DOCKERHUB_USER }}/foodgram_infra:latest
 

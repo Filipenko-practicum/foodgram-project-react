@@ -29,9 +29,9 @@ services:
     image: deathtoalllive/foodgram_gateway
     env_file: .env
     depends_on:
-      backend
+      - backend
     volumes:
-      static:/static
-      media:/media
+      - static:/static
+      - media:/media
     ports:
-      8080:80
+      - 8080:80

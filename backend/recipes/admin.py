@@ -6,8 +6,15 @@ from django.shortcuts import render
 from django.urls import path, reverse
 
 from .forms import IngredientImportForm
-from .models import (Favorite, ImportIngredient, Ingredient, Recipe,
-                     RecipeIngredient, ShoppingСart, Tag)
+from .models import (
+    Favorite,
+    ImportIngredient,
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    ShoppingСart,
+    Tag,
+)
 
 
 @admin.register(ImportIngredient)

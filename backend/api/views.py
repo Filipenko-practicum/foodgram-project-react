@@ -10,11 +10,22 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from foodgram.constants import FILE_NAME
-from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingСart, Tag)
-from recipes.serializers import (FavoriteSerializer, IngredienSerializer,
-                                 RecipeCreateSerializer, RecipeListSerializer,
-                                 ShoppingCartSerializer, TagSerializer)
+from recipes.models import (
+    Favorite,
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    ShoppingСart,
+    Tag,
+)
+from recipes.serializers import (
+    FavoriteSerializer,
+    IngredienSerializer,
+    RecipeCreateSerializer,
+    RecipeListSerializer,
+    ShoppingCartSerializer,
+    TagSerializer,
+)
 from users.pagination import LimitPageNumberPagination
 
 from .filters import IngredientSearchFilter, RecipeFilter

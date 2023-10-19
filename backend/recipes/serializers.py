@@ -1,16 +1,26 @@
 from django.forms import ValidationError
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.serializers import (IntegerField, ModelSerializer,
-                                        PrimaryKeyRelatedField, ReadOnlyField,
-                                        SerializerMethodField)
+from rest_framework.serializers import (
+    IntegerField,
+    ModelSerializer,
+    PrimaryKeyRelatedField,
+    ReadOnlyField,
+    SerializerMethodField,
+)
 from rest_framework.validators import UniqueTogetherValidator
 
 from users.models import Subscribed
 from users.serializers import UserSerializer
 
-from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                     ShoppingСart, Tag)
+from .models import (
+    Favorite,
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    ShoppingСart,
+    Tag,
+)
 
 
 class TagSerializer(ModelSerializer):

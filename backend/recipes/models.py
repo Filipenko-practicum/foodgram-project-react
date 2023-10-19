@@ -2,9 +2,15 @@ from colorfield.fields import ColorField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from foodgram.constants import (DEFAULT_COLOR, DIRICTORY_PATH,
-                                INGREDIENT_UNITS, MAX_INGREDIENT,
-                                MAX_TIME_COOK, MIN_INGREDIENT, MIN_TIME_COOK)
+from foodgram.constants import (
+    DEFAULT_COLOR,
+    DIRICTORY_PATH,
+    INGREDIENT_UNITS,
+    MAX_INGREDIENT,
+    MAX_TIME_COOK,
+    MIN_INGREDIENT,
+    MIN_TIME_COOK,
+)
 from users.models import User
 
 

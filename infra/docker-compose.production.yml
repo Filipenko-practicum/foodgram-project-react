@@ -18,7 +18,7 @@ services:
     image: deathtoalllive/foodgram_backend
     env_file: .env
     volumes:
-      - backend_static:/backend_static
+      - backend_static:/app/backend_static
       - backend_media:/app/media
   frontend:
     image: deathtoalllive/foodgram_frontend

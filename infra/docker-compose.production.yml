@@ -2,7 +2,8 @@ version: '3'
 
 volumes:
   static:
-  media:
+  backend_static:
+  backend_media:
   pg_data:
 
 services:
@@ -17,21 +18,21 @@ services:
     image: deathtoalllive/foodgram_backend
     env_file: .env
     volumes:
-      - static:/backend_static
-      - media:/media
+      - backend_static:/app/static
+      - backend_media:/app/media
   frontend:
     image: deathtoalllive/foodgram_frontend
     env_file: .env
-    command: cp -r /app/build/. /frontend_static/
+    command: cp -r /app/build/. /static/
     volumes:
-      - static:/frontend_static
+      - static:/app/result_build/build
   nginx:
     image: deathtoalllive/foodgram_gateway
     env_file: .env
     depends_on:
       - backend
     volumes:
-      - static:/static
-      - media:/media
+      - backend_static:/backend_static
+      - backend_media:/backend_media
     ports:
       - 8080:80

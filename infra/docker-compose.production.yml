@@ -33,7 +33,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - static:/usr/share/nginx/html/
-      - static:/statifiles
+      - static:/staticfiles
       - backend_media:/backend_media
       - ../docs/:/usr/share/nginx/html/api/docs/
     ports:

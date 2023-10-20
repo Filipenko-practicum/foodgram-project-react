@@ -2,7 +2,6 @@ version: '3'
 
 volumes:
   static:
-  backend_static:
   backend_media:
   postgres_data:
 
@@ -18,7 +17,7 @@ services:
     image: deathtoalllive/foodgram_backend
     env_file: .env
     volumes:
-      - backend_static:/static
+      - static:/backend_static
       - backend_media:/app/media
   frontend:
     image: deathtoalllive/foodgram_frontend
@@ -34,7 +33,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - static:/usr/share/nginx/html/
-      - backend_static:/backend_static
+      - static:/statifiles
       - backend_media:/backend_media
       - ../docs/:/usr/share/nginx/html/api/docs/
     ports:

@@ -25,7 +25,7 @@ services:
     env_file: .env
     command: cp -r /app/build/. /result_build/
     volumes:
-      - static:/app/result_build
+      - static:/app/result_build/build
   nginx:
     image: nginx:1.22.1
     env_file: .env

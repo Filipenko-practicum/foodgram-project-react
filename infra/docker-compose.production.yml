@@ -32,7 +32,10 @@ services:
     depends_on:
       - backend
     volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - static:/usr/share/nginx/html/
       - backend_static:/backend_static
       - backend_media:/backend_media
+      - ../docs/:/usr/share/nginx/html/api/docs/
     ports:
       - 8080:80

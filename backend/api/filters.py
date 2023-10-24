@@ -38,10 +38,6 @@ from recipes.models import Ingredient, Recipe, Tag
 #         if value:
 #             return queryset.filter(shoppingcart__user=user)
 #         return queryset
-
-
-
-
 User = get_user_model()
 
 

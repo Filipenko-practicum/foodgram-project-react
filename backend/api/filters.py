@@ -1,8 +1,10 @@
+from django.contrib.auth import get_user_model
+from django_filters import rest_framework as filters
 from django_filters.rest_framework import filters
+
 # from rest_framework.filters import SearchFilter
 # FilterSet
-from recipes.models import Ingredient, Recipe
-
+from recipes.models import Ingredient, Recipe, Tag
 
 # class IngredientSearchFilter(SearchFilter):
 #     """Фильтр ингридиентов."""
@@ -39,9 +41,6 @@ from recipes.models import Ingredient, Recipe
 
 
 
-from django.contrib.auth import get_user_model
-from django_filters import rest_framework as filters
-from recipes.models import Ingredient, Recipe, Tag
 
 User = get_user_model()
 

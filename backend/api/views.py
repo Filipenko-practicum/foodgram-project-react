@@ -28,7 +28,8 @@ from recipes.serializers import (
 )
 from users.pagination import LimitPageNumberPagination
 
-from .filters import IngredientSearchFilter, RecipeFilter
+from .filters import RecipeFilter,IngredientFilter
+# IngredientSearchFilter
 from .permissions import IsOwnerOrAdminOrReadOnly
 
 
@@ -49,7 +50,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     permission_classes = (AllowAny,)
     pagination_class = None
     filter_backends = [DjangoFilterBackend]
-    filterset_class = IngredientSearchFilter
+    filterset_class = IngredientFilter
 
 
 class RecipeViewSet(ModelViewSet):

@@ -15,7 +15,7 @@ from recipes.models import (
     Ingredient,
     Recipe,
     RecipeIngredient,
-    ShoppingСart,
+    ShoppingCart,
     Tag,
 )
 from recipes.serializers import (
@@ -131,13 +131,13 @@ class RecipeViewSet(ModelViewSet):
     def shopping_cart(self, request, pk):
         """Метод добавления рецепта в корзину"""
         return self.adding_recipe(
-            ShoppingCartSerializer, ShoppingСart, request, pk
+            ShoppingCartSerializer, ShoppingCart, request, pk
         )
 
     @shopping_cart.mapping.delete
     def remove_from_shopping_cart(self, request, pk):
         """Метод удаления из корзины"""
-        get_object_or_404(ShoppingСart, user=request.user, recipe=pk).delete()
+        get_object_or_404(ShoppingCart, user=request.user, recipe=pk).delete()
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(

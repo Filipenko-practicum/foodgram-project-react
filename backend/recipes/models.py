@@ -42,7 +42,7 @@ class Tag(models.Model):
         default=DEFAULT_COLOR,
         null=True,
     )
-    slug = models.SlugField(
+    slug = models.CharField(
         'Уникальный Тег',
         max_length=200,
         unique=True,

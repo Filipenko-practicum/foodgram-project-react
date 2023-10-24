@@ -138,7 +138,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tagsslug', 'author', 'ingredients',
+        fields = ('id', 'tags', 'author', 'ingredients',
                   'is_favorited', 'is_in_shopping_cart',
                   'name', 'image', 'text', 'cooking_time')
 
@@ -168,7 +168,7 @@ class RecipeCreateSerializer(ModelSerializer):
         fields = (
             'id',
             'image',
-            'tagsslug',
+            'tags',
             'ingredients',
             'name',
             'text',
@@ -217,7 +217,7 @@ class RecipeCreateSerializer(ModelSerializer):
     def create(self, validated_data):
         """Создание рецепта."""
 
-        tags_data = validated_data.pop('tagsslug', None)
+        tags_data = validated_data.pop('tags', None)
         ingredients_data = validated_data.pop('ingredients', None)
         author = self.context.get('request').user
         recipe = Recipe.objects.create(author=author, **validated_data)

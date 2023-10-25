@@ -10,10 +10,10 @@ from .models import (
     Favorite,
     ImportIngredient,
     Ingredient,
+    ShoppingCart,
     Recipe,
     RecipeIngredient,
     Tag,
-    ShoppingCart,
 )
 
 

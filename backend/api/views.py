@@ -29,7 +29,6 @@ from recipes.serializers import (
 from users.pagination import LimitPageNumberPagination
 
 from .filters import IngredientSearchFilter, RecipeFilter
-
 from .permissions import IsOwnerOrAdminOrReadOnly
 
 

@@ -179,7 +179,7 @@ class RecipeIngredient(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.recipe} содержит ингредиент/ты {self.ingredient}'
+        return f'{self.recipe} содержит ингредиенты {self.ingredient}'
 
 
 class UserRelation(models.Model):
@@ -220,6 +220,6 @@ class ShoppingCart(UserRelation):
     """
 
     class Meta(UserRelation.Meta):
-        default_related_name = 'shoppingcart'
+        default_related_name = 'shopping_cart'
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзина'

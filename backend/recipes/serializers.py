@@ -270,7 +270,7 @@ class SubscribedSerializer(UserSerializer):
                 )
             )
         except ValueError:
-            raise ValueError('должен быть целым числом')
+            raise ValueError('должно быть целым числом')
         author_recipes = object.recipes.all()[:limit]
         return RecipeSerializer(author_recipes, many=True).data
 

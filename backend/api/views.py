@@ -81,7 +81,7 @@ class RecipeViewSet(ModelViewSet):
         )
 
     @staticmethod
-    def create_shopping_cart_file(self, request, ingredients):
+    def create_shoppingcart_file(self, request, ingredients):
         """Кастомный метод создания списка. покупок"""
         user = self.request.user
         filename = f'{user.username}_{FILE_NAME}'
@@ -126,14 +126,14 @@ class RecipeViewSet(ModelViewSet):
         permission_classes=(IsAuthenticated,),
         pagination_class=None,
     )
-    def shopping_cart(self, request, pk):
+    def shoppingcart(self, request, pk):
         """Метод добавления рецепта в корзину"""
         return self.adding_recipe(
             ShoppingCartSerializer, ShoppingCart, request, pk
         )
 
-    @shopping_cart.mapping.delete
-    def remove_from_shopping_cart(self, request, pk):
+    @shoppingcart.mapping.delete
+    def remove_from_shoppingcart(self, request, pk):
         """Метод удаления из корзины"""
         get_object_or_404(ShoppingCart, user=request.user, recipe=pk).delete()
         return response.Response(status=status.HTTP_204_NO_CONTENT)
@@ -141,7 +141,7 @@ class RecipeViewSet(ModelViewSet):
     @action(
         detail=False, methods=['get'], permission_classes=(IsAuthenticated,)
     )
-    def download_shopping_cart(self, request):
+    def download_shoppingcart(self, request):
         """Метод получения списка покупок"""
         ingredients = (
             RecipeIngredient.objects.filter(
@@ -151,4 +151,4 @@ class RecipeViewSet(ModelViewSet):
             .order_by('ingredient__name')
             .annotate(amount=Sum('amount'))
         )
-        return self.create_shopping_cart_file(self, request, ingredients)
+        return self.create_shoppingcart_file(self, request, ingredients)

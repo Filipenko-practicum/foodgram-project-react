@@ -133,7 +133,7 @@ class RecipeListSerializer(ModelSerializer):
         source='recipe_ingredients',
         read_only=True)
     is_favorited = SerializerMethodField()
-    is_in_shopping_cart = SerializerMethodField()
+    is_in_shoppingcart = SerializerMethodField()
 
     class Meta:
         model = Recipe

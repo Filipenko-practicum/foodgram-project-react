@@ -145,7 +145,7 @@ class RecipeViewSet(ModelViewSet):
         """Метод получения списка покупок"""
         ingredients = (
             RecipeIngredient.objects.filter(
-                recipe__shopping_cart__user=self.request.user
+                recipe__shoppingcart__user=self.request.user
             )
             .values('ingredient__name', 'ingredient__measurement_unit')
             .order_by('ingredient__name')

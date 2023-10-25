@@ -152,7 +152,7 @@ class RecipeListSerializer(ModelSerializer):
         return bool(
             request
             and request.user.is_authenticated
-            and request.user.shoppingcart.filter(
+            and request.user.shopping_cart.filter(
                 recipe=obj, user=request.user
             ).exists()
         )

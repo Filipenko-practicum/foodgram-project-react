@@ -15,7 +15,7 @@ class IngredientSearchFilter(filters.FilterSet):
 
 
 class RecipeFilter(filters.FilterSet):
-    tags = filters.ModelMultipleChoiceFilter(
+    tags = filters.CharFilter(
         field_name='tags',
         to_field_name='slug',
         queryset=Tag.objects.all(),
@@ -42,6 +42,8 @@ class RecipeFilter(filters.FilterSet):
         fields = (
             'tags',
             'author',
+            'is_favorited',
+            'is_in_shoppingcart',
         )
 
 

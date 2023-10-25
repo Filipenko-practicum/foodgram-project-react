@@ -12,7 +12,7 @@ from .models import (
     Ingredient,
     Recipe,
     RecipeIngredient,
-    ShoppingСart,
+    ShoppingCart,
     Tag,
 )
 
@@ -141,4 +141,4 @@ admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(RecipeIngredient, IngredientRecipeAdmin)
 admin.site.register(Favorite, FavouriteAdmin)
-admin.site.register(ShoppingСart, ShoppingCartAdmin)
+admin.site.register(ShoppingCart, ShoppingCartAdmin)

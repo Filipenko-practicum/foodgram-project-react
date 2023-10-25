@@ -1,5 +1,6 @@
 from django_filters.rest_framework import filters
 from recipes.models import Ingredient, Recipe, Tag
+
 from django.contrib.auth import get_user_model
 
 # class IngredientSearchFilter(FilterSet):
@@ -34,7 +35,6 @@ from django.contrib.auth import get_user_model
 #         if value:
 #             return queryset.filter(shopping_cart__user=user)
 #         return queryset
-
 User = get_user_model()
 
 

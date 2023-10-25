@@ -118,7 +118,7 @@ class HowIngredientSerilizer(ModelSerializer):
         fields = ('id', 'amount')
 
 
-class RecipeListSerializer(serializers.ModelSerializer):
+class RecipeListSerializer(ModelSerializer):
     """
     Serializer для модели Recipe - чтение данных.
     Находится ли рецепт в избранном, списке покупок.
@@ -133,8 +133,8 @@ class RecipeListSerializer(serializers.ModelSerializer):
         many=True,
         source='recipe_ingredients',
         read_only=True)
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = SerializerMethodField()
+    is_in_shopping_cart = SerializerMethodField()
 
     class Meta:
         model = Recipe
@@ -149,10 +149,14 @@ class RecipeListSerializer(serializers.ModelSerializer):
         return False
 
     def get_is_in_shopping_cart(self, obj):
-        user = self.context.get('request').user
-        if not user.is_anonymous:
-            return ShoppingCart.objects.filter(recipe=obj).exists()
-        return False
+        request = self.context.get('request')
+        return bool(
+            request
+            and request.user.is_authenticated
+            and request.user.shoppingcart.filter(
+                recipe=obj, user=request.user
+            ).exists()
+        )
 
 
 class RecipeCreateSerializer(ModelSerializer):

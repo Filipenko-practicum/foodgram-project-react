@@ -12,8 +12,8 @@ from .models import (
     Ingredient,
     Recipe,
     RecipeIngredient,
-    ShoppingCart,
     Tag,
+    ShoppingCart,
 )
 
 
@@ -86,6 +86,7 @@ class FavouriteAdmin(admin.ModelAdmin):
     list_editable = ('user', 'recipe')
 
 
+@admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     """
     Админ-зона покупок.
@@ -141,4 +142,3 @@ admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(RecipeIngredient, IngredientRecipeAdmin)
 admin.site.register(Favorite, FavouriteAdmin)
-admin.site.register(ShoppingCart, ShoppingCartAdmin)

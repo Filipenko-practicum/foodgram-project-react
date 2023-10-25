@@ -18,7 +18,7 @@ from .models import (
     Ingredient,
     Recipe,
     RecipeIngredient,
-    ShoppingСart,
+    ShoppingCart,
     Tag,
 )
 
@@ -88,11 +88,11 @@ class ShoppingCartSerializer(ModelSerializer):
     """Сериалайзер модели Cart."""
 
     class Meta:
-        model = ShoppingСart
+        model = ShoppingCart
         fields = ('user', 'recipe')
         validators = [
             UniqueTogetherValidator(
-                queryset=ShoppingСart.objects.all(),
+                queryset=ShoppingCart.objects.all(),
                 fields=['user', 'recipe'],
                 message='Добавлен уже в корзину!',
             )
@@ -151,7 +151,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
     def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
         if not user.is_anonymous:
-            return ShoppingСart.objects.filter(recipe=obj).exists()
+            return ShoppingCart.objects.filter(recipe=obj).exists()
         return False
 
 

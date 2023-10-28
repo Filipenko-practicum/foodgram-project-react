@@ -229,7 +229,6 @@ class RecipeCreateSerializer(ModelSerializer):
         author = self.context.get('request').user
         recipe = Recipe.objects.create(author=author, **validated_data)
         recipe.tags.set(tags_data)
-        
         self.create_recipe_ingredients(recipe, ingredients_data)
         return recipe
 

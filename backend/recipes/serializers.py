@@ -130,7 +130,7 @@ class RecipeListSerializer(ModelSerializer):
         read_only=True)
     ingredients = RecipeIngredientSerializer(
         many=True,
-        source='recipe_ingredients',
+        source='recipeingredients_set',
         read_only=True)
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
@@ -229,6 +229,7 @@ class RecipeCreateSerializer(ModelSerializer):
         author = self.context.get('request').user
         recipe = Recipe.objects.create(author=author, **validated_data)
         recipe.tags.set(tags_data)
+        
         self.create_recipe_ingredients(recipe, ingredients_data)
         return recipe
 

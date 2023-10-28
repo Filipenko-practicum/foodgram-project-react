@@ -81,8 +81,8 @@ class RecipeViewSet(ModelViewSet):
         )
 
     @staticmethod
-    def create_shoppingcart_file(self, request, ingredients):
-        """Кастомный метод создания списка Ыпокупок"""
+    def create_shopping_cart_file(self, request, ingredients):
+        """Кастомный метод создания списка покупок"""
         user = self.request.user
         filename = f'{user.username}_{FILE_NAME}'
         today = dt.today()
@@ -145,10 +145,10 @@ class RecipeViewSet(ModelViewSet):
         """Метод получения списка покупок"""
         ingredients = (
             RecipeIngredient.objects.filter(
-                recipe__shoppingcart__user=self.request.user
+                recipe__shopping_cart__user=self.request.user
             )
             .values('ingredient__name', 'ingredient__measurement_unit')
             .order_by('ingredient__name')
             .annotate(amount=Sum('amount'))
         )
-        return self.create_shoppingcart_file(self, request, ingredients)
+        return self.create_shopping_cart_file(self, request, ingredients)

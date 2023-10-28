@@ -216,7 +216,7 @@ class Favorite(UserRelation):
 
 class ShoppingCart(UserRelation):
     """Рецепты в корзине покупок.
-    Модель связывает Recipe и User.
+    Модель связывает Recipe и User
     """
 
     class Meta(UserRelation.Meta):

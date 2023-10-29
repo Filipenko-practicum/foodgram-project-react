@@ -250,7 +250,7 @@ class RecipeCreateSerializer(ModelSerializer):
 
         return instance
 
-    def to_representation(self, instance): 
+    def to_representation(self, instance):
         return RecipeListSerializer(instance, context={
             'request': self.context.get('request')
         }).data

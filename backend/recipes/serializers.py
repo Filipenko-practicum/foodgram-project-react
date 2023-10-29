@@ -180,7 +180,6 @@ class RecipeCreateSerializer(ModelSerializer):
             'name',
             'text',
             'cooking_time',
-            'author',
         )
 
     def validate(self, data):

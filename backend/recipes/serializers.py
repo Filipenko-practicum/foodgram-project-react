@@ -218,8 +218,8 @@ class RecipeCreateSerializer(ModelSerializer):
             recipe_ingredients.append(
                 RecipeIngredient(
                     recipe=recipe, ingredient=ingredient, amount=amount
+                )
             )
-        )
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
     def create(self, validated_data):

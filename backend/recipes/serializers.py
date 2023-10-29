@@ -180,68 +180,75 @@ class RecipeCreateSerializer(ModelSerializer):
             'name',
             'text',
             'cooking_time',
+            'author',
         )
 
-    # def validate(self, data):
-    #     """Метод валидации для создания рецепта"""
-    #     ingredients = data.get('ingredients')
-    #     tags = data.get('tags')
-    #     image = data.get('image')
+    def validate(self, data):
+        """Метод валидации для создания рецепта"""
+        ingredients = data.get('ingredients')
+        tags = data.get('tags')
+        image = data.get('image')
 
-    #     if not ingredients:
-    #         raise ValidationError('Выберите ингредиенты!')
+        if not ingredients:
+            raise ValidationError('Выберите ингредиенты!')
 
-    #     if not tags:
-    #         raise ValidationError('Укажите тэг!')
+        if not tags:
+            raise ValidationError('Укажите тэг!')
 
-    #     if not image:
-    #         raise ValidationError('Нужна картинка,пустым не должно быть!')
+        if not image:
+            raise ValidationError('Нужна картинка,пустым не должно быть!')
 
-    #     ingredient_ids = [ingredient['id'] for ingredient in ingredients]
-    #     if len(set(ingredient_ids)) != len(ingredient_ids):
-    #         raise ValidationError('Ингредиенты не должны повторяться.')
+        ingredient_ids = [ingredient['id'] for ingredient in ingredients]
+        if len(set(ingredient_ids)) != len(ingredient_ids):
+            raise ValidationError('Ингредиенты не должны повторяться.')
 
-    #     tag_ids = [tag.id for tag in tags]
-    #     if len(set(tag_ids)) != len(tag_ids):
-    #         raise ValidationError('Тэги не должны повторяться.')
+        tag_ids = [tag.id for tag in tags]
+        if len(set(tag_ids)) != len(tag_ids):
+            raise ValidationError('Тэги не должны повторяться.')
 
-    #     return data
+        return data
 
     @staticmethod
-    def create_recipe_ingredients(recipe, ingredients_data):
-        # recipe.ingredients.clear()
-        recipe_ingredients = []
-        for ingredient_data in ingredients_data:
-            ingredient = ingredient_data['id']
-            amount = ingredient_data['amount']
-            recipe_ingredients.append(
-                RecipeIngredient(
-                    recipe=recipe, ingredient=ingredient, amount=amount
-                )
+    def create_recipe_ingredients(recipe,instance, ingredients_data):
+        recipe_ingredients = [
+            RecipeIngredient(
+                recipe=instance,
+                ingredient=ingredient['id'],
+                amount=ingredient['amount']
             )
+            for ingredient in ingredients_data
+        ]
+
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
     def create(self, validated_data):
         """Создание рецепта."""
 
-        tags_data = validated_data.pop('tags', None)
-        ingredients_data = validated_data.pop('ingredients', None)
-        author = self.context.get('request').user
-        recipe = Recipe.objects.create(author=author, **validated_data)
+        tags_data = validated_data.pop('tags')
+        ingredients_data = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create( **validated_data)
         recipe.tags.set(tags_data)
         self.create_recipe_ingredients(recipe, ingredients_data)
         return recipe
 
     def update(self, instance, validated_data):
         """Редактирование рецепта."""
-        tags_data = validated_data.pop('tags', None)
-        instance.tags.set(tags_data)
-        ingredients_data = validated_data.pop('ingredients', None)
+        RecipeIngredient.objects.filter(recipe=instance).delete()
+        ingredients_data = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data('text', instance.text)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time
+        )
+        instance.save()
         self.create_recipe_ingredients(instance, ingredients_data)
-        return super().update(instance, validated_data)
-
+        instance.tags.set(tags)
+        return instance
     def to_representation(self, instance):
-        return RecipeListSerializer(instance, context=self.context).data
+        return RecipeListSerializer(instance, context={
+            'request': self.context.get('request')
+        }).data
 
 
 class SubscribedSerializer(UserSerializer):

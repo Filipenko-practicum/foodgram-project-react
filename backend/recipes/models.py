@@ -210,6 +210,6 @@ class ShoppingCart(UserRelation):
     """
 
     class Meta(UserRelation.Meta):
-        default_related_name = 'shopping_cart'
+        default_related_name = 'shoppingcart'
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзина'

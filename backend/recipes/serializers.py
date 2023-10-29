@@ -113,7 +113,7 @@ class HowIngredientSerilizer(ModelSerializer):
     amount = IntegerField(min_value=1, max_value=1000)
 
     class Meta:
-        model = Ingredient
+        model = RecipeIngredient
         fields = ('id', 'amount')
 
 

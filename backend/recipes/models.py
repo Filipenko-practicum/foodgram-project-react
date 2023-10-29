@@ -172,11 +172,6 @@ class RecipeIngredient(models.Model):
         ordering = ('recipe',)
         verbose_name = 'Ингредиенты в рецепте'
         verbose_name_plural = 'Ингредиенты в рецептах'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['recipe', 'ingredient'], name='unique_combination'
-            )
-        ]
 
     def __str__(self):
         return f'{self.recipe} содержит ингредиенты {self.ingredient}'
@@ -220,6 +215,6 @@ class ShoppingCart(UserRelation):
     """
 
     class Meta(UserRelation.Meta):
-        default_related_name = 'shoppingcart'
+        default_related_name = 'shopping_cart'
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзина'

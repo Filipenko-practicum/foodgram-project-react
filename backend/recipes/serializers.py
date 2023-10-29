@@ -209,7 +209,6 @@ class RecipeCreateSerializer(ModelSerializer):
 
         return data
 
-    @staticmethod
     def create_recipe_ingredients(self, instance, ingredients_data):
         recipe_ingredients = [
             RecipeIngredient(

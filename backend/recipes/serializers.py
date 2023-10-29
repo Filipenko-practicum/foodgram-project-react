@@ -246,8 +246,9 @@ class RecipeCreateSerializer(ModelSerializer):
 
         self.create_recipe_ingredients(instance, ingredients_data)
         instance.tags.set(tags)
-        
+
         return instance
+
     def to_representation(self, instance):
         return RecipeListSerializer(instance, context={
             'request': self.context.get('request')

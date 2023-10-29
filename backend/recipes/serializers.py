@@ -165,6 +165,7 @@ class RecipeListSerializer(ModelSerializer):
 class RecipeCreateSerializer(ModelSerializer):
     """Serializer для модели Recipe - запись / обновление / удаление данных."""
 
+    author = UserSerializer(read_only=True)
     tags = PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all())
     cooking_time = IntegerField(min_value=1, max_value=1000)
     ingredients = HowIngredientSerilizer(many=True)
@@ -180,6 +181,7 @@ class RecipeCreateSerializer(ModelSerializer):
             'name',
             'text',
             'cooking_time',
+            'author',
         )
 
     def validate(self, data):
@@ -248,7 +250,7 @@ class RecipeCreateSerializer(ModelSerializer):
 
         return instance
 
-    def to_representation(self, instance):
+    def to_representation(self, instance): 
         return RecipeListSerializer(instance, context={
             'request': self.context.get('request')
         }).data

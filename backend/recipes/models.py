@@ -81,11 +81,6 @@ class Ingredient(models.Model):
         ordering = ['name']
         verbose_name = "ингредиент"
         verbose_name_plural = "ингредиенты"
-        constraints = [
-            models.UniqueConstraint(
-                fields=['name', 'measurement_unit'], name='unique_ingredients'
-            )
-        ]
 
     def __str__(self):
         return f'{self.name},в {self.measurement_unit}'

@@ -108,7 +108,7 @@ class HowIngredientSerilizer(ModelSerializer):
     """Сереалайзер колличества ингредиентов в рецепте."""
 
     id = PrimaryKeyRelatedField(
-        queryset=Ingredient.objects.all().values_list('id', flat=True)
+        queryset=Ingredient.objects.all()
     )
     amount = IntegerField(min_value=1, max_value=1000)
 
@@ -130,7 +130,7 @@ class RecipeListSerializer(ModelSerializer):
         read_only=True)
     ingredients = RecipeIngredientSerializer(
         many=True,
-        source='recipeingredients_set',
+        source='recipeingredient_set',
         read_only=True)
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
@@ -212,11 +212,10 @@ class RecipeCreateSerializer(ModelSerializer):
         recipe.ingredients.clear()
         recipe_ingredients = []
         for ingredient_data in ingredients_data:
-            ingredient_id = ingredient_data['id']
             amount = ingredient_data['amount']
             recipe_ingredients.append(
                 RecipeIngredient(
-                    recipe=recipe, ingredient_id=ingredient_id, amount=amount
+                    recipe=recipe, ingredient=ingredient_data, amount=amount
                 )
             )
         RecipeIngredient.objects.bulk_create(recipe_ingredients)

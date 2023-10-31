@@ -3,6 +3,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+
 from recipes.models import Ingredient
 
 
@@ -14,18 +15,18 @@ class Command(BaseCommand):
                             help='Path to the CSX file')
 
     def handle(self, *args, **options):
-        csv_path=options['path'] or str(
-             Path(settings.BASE_BIR) / 'data',
+        csv_path = options['path'] or str(
+            Path(settings.BASE_BIR) / 'data',
         )
 
         self.import_csv_data(
-             csv_path,
-             'ingredients.csv',
-             self.import_ingredients
+            csv_path,
+            'ingredients.csv',
+            self.import_ingredients
         )
         self.stdout.write(
             self.style.SUCCESS('=== Ингредиенты успешно загружены ===')
-            )
+        )
 
     def import_csv_data(self, csv_path, filename, import_func):
         file_path = Path(csv_path) / filename

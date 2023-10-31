@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         csv_path = options['path'] or str(
-            Path(settings.BASE_BIR) / 'data',
+            Path(settings.BASE_DIR) / 'data',
         )
 
         self.import_csv_data(

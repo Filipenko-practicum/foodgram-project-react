@@ -5,7 +5,7 @@ from django.db import models
 from foodgram.constants import (
     DEFAULT_COLOR,
     DIRICTORY_PATH,
-    INGREDIENT_UNITS,
+    # INGREDIENT_UNITS,
     MAX_INGREDIENT,
     MAX_TIME_COOK,
     MIN_INGREDIENT,

@@ -1,5 +1,4 @@
 from django.forms import ValidationError
-from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
     IntegerField,
@@ -214,33 +213,24 @@ class RecipeCreateSerializer(ModelSerializer):
 
         return data
 
-    def create_recipe_ingredients(ingredients, recipe):
-        ingredient_list = []
+    def add_ingredients_and_tags(self, tags, ingredients, recipe):
+        recipe.tags.set(tags)
+        ingredients_list = []
         for ingredient in ingredients:
-            current_ingredient = get_object_or_404(
-                Ingredient,
-                id=ingredient.get('id')
+            new_ingredient = RecipeIngredient(
+                recipe=recipe,
+                ingredient_id=ingredient['id'],
+                amount=ingredient['amount'],
             )
-            amount = ingredient.get('amount')
-            ingredient_list.append(
-                RecipeIngredient(
-                    recipe=recipe,
-                    ingredient=current_ingredient,
-                    amount=amount
-                )
-            )
-        RecipeIngredient.objects.bulk_create(ingredient_list)
+            ingredients_list.append(new_ingredient)
+        RecipeIngredient.objects.bulk_create(ingredients_list)
+        return recipe
 
     def create(self, validated_data):
-        """Создание рецепта."""
-
-        request = self.context.get('request')
-        ingredients = validated_data.pop('recipeingredients')
+        ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
-        recipe = Recipe.objects.create(author=request.user, **validated_data)
-        recipe.tags.set(tags)
-        self.create_recipe_ingredients(ingredients, recipe)
-        return recipe
+        recipe = Recipe.objects.create(**validated_data)
+        return self.add_ingredients_and_tags(tags, ingredients, recipe)
 
     def update(self, instance, validated_data):
         """Редактирование рецепта."""

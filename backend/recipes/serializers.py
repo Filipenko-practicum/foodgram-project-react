@@ -131,7 +131,7 @@ class RecipeListSerializer(ModelSerializer):
         read_only=True)
     ingredients = RecipeIngredientSerializer(
         many=True,
-        source='recipeingredient_set',
+        source='recipesingredients_set',
         read_only=True)
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
@@ -235,20 +235,13 @@ class RecipeCreateSerializer(ModelSerializer):
     def update(self, instance, validated_data):
         """Редактирование рецепта."""
 
-        RecipeIngredient.objects.filter(recipe=instance).delete()
-        ingredients_data = validated_data.pop('ingredients')
+        instance.ingredients.clear()
+        ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
+        instance = super().update(instance, validated_data)
+        return self.add_ingredients_and_tags(
+            tags, ingredients, instance
         )
-        instance.save()
-
-        self.create_recipe_ingredients(instance, ingredients_data)
-        instance.tags.set(tags)
-
-        return instance
 
     def to_representation(self, instance):
         return RecipeListSerializer(instance, context={

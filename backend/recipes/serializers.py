@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django.forms import ValidationError
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
@@ -169,7 +170,10 @@ class RecipeCreateSerializer(ModelSerializer):
     author = UserSerializer(read_only=True)
     tags = PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all())
     cooking_time = IntegerField(min_value=1, max_value=1000)
-    ingredients = HowIngredientSerilizer(many=True)
+    ingredients = HowIngredientSerilizer(
+        many=True,
+        source='recipeingredient_set'
+    )
     image = Base64ImageField()
 
     class Meta:
@@ -210,27 +214,30 @@ class RecipeCreateSerializer(ModelSerializer):
 
         return data
 
-    def create_recipe_ingredients(self, instance, ingredients_data):
-        recipe_ingredients = [
-            RecipeIngredient(
-                recipe=instance,
-                ingredient=ingredient['id'],
-                amount=ingredient['amount']
+    def create_recipe_ingredients(ingredients, recipe):
+        ingredient_list = []
+        for ingredient in ingredients:
+            current_ingredient = get_object_or_404(Ingredient,
+                                               id=ingredient.get('id'))
+            amount = ingredient.get('amount')
+            ingredient_list.append(
+                RecipeIngredient(
+                    recipe=recipe,
+                    ingredient=current_ingredient,
+                    amount=amount
+                )
             )
-            for ingredient in ingredients_data
-        ]
-
-        RecipeIngredient.objects.bulk_create(recipe_ingredients)
+        RecipeIngredient.objects.bulk_create(ingredient_list)
 
     def create(self, validated_data):
         """Создание рецепта."""
 
-        tags_data = validated_data.pop('tags')
-        ingredients_data = validated_data.pop('ingredients')
-        author = self.context.get('request').user
-        recipe = Recipe.objects.create(author=author, **validated_data)
-        recipe.tags.set(tags_data)
-        self.create_recipe_ingredients(recipe, ingredients_data)
+        request = self.context.get('request')
+        ingredients = validated_data.pop('recipeingredients')
+        tags = validated_data.pop('tags')
+        recipe = Recipe.objects.create(author=request.user, **validated_data)
+        recipe.tags.set(tags)
+        self.create_ingredients(ingredients, recipe)
         return recipe
 
     def update(self, instance, validated_data):

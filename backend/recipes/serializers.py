@@ -171,7 +171,6 @@ class RecipeCreateSerializer(ModelSerializer):
     cooking_time = IntegerField(min_value=1, max_value=1000)
     ingredients = HowIngredientSerilizer(
         many=True,
-        source='recipeingredient_set'
     )
     image = Base64ImageField()
 
@@ -227,7 +226,7 @@ class RecipeCreateSerializer(ModelSerializer):
         return recipe
 
     def create(self, validated_data):
-        ingredients = validated_data.pop('ingredient')
+        ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         return self.add_ingredients_and_tags(tags, ingredients, recipe)

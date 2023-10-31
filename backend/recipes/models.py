@@ -66,7 +66,6 @@ class Ingredient(models.Model):
     measurement_unit = models.CharField(
         'Единица измерения',
         max_length=200,
-        default='',
     )
 
     class Meta:
@@ -142,7 +141,7 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingredient',
+        related_name='ingredients',
         verbose_name='Ингредиенты',
     )
     amount = models.PositiveSmallIntegerField(

@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             with open(os.path.join(DATA_ROOT, options['filename']),
-                      'r', encoding='utf-8') as f:
+                      'r') as f:
                 data = csv.reader(f)
                 for row in data:
                     name, measurement_unit = row

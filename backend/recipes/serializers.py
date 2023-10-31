@@ -107,10 +107,7 @@ class ShoppingCartSerializer(ModelSerializer):
 class HowIngredientSerilizer(ModelSerializer):
     """Сереалайзер колличества ингредиентов в рецепте."""
 
-    id = PrimaryKeyRelatedField(
-        queryset=Ingredient.objects.all()
-    )
-    amount = IntegerField(min_value=1, max_value=1000)
+    id = IntegerField(write_only=True)
 
     class Meta:
         model = RecipeIngredient

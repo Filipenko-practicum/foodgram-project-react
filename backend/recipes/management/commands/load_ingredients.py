@@ -13,7 +13,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         file_path = options["path"]
 
-        with open(file_path, encoding='utf-8') as f:
+        with open(file_path, encoding='cp1251') as f:
             jsondata = json.load(f)
             if 'color' in jsondata[0]:
                 for line in jsondata:

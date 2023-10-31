@@ -183,7 +183,7 @@ class RecipeCreateSerializer(ModelSerializer):
 
     def validate(self, data):
         """Метод валидации для создания рецепта"""
-        ingredients = data.get('ingredients')
+        ingredients = data.get('ingredient')
         tags = data.get('tags')
         image = data.get('image')
 
@@ -222,7 +222,7 @@ class RecipeCreateSerializer(ModelSerializer):
         """Создание рецепта."""
 
         tags_data = validated_data.pop('tags')
-        ingredients_data = validated_data.pop('ingredients')
+        ingredients_data = validated_data.pop('ingredient')
         author = self.context.get('request').user
         recipe = Recipe.objects.create(author=author, **validated_data)
         recipe.tags.set(tags_data)
@@ -233,7 +233,7 @@ class RecipeCreateSerializer(ModelSerializer):
         """Редактирование рецепта."""
 
         RecipeIngredient.objects.filter(recipe=instance).delete()
-        ingredients_data = validated_data.pop('ingredients')
+        ingredients_data = validated_data.pop('ingredient')
         tags = validated_data.pop('tags')
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data('text', instance.text)

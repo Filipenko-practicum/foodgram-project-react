@@ -1,33 +1,42 @@
 import csv
-import os
+from pathlib import Path
 
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-
+from django.core.management.base import BaseCommand
 from recipes.models import Ingredient
-
-DATA_ROOT = os.path.join(settings.BASE_DIR, 'data')
 
 
 class Command(BaseCommand):
     """Добавляем ингредиенты из файла CSV."""
 
     def add_arguments(self, parser):
-        parser.add_argument('filename', default='ingredients.csv',
-                            nargs='?', type=str)
+        parser.add_argument('--path', type=str,
+                            help='Path to the CSX file')
 
     def handle(self, *args, **options):
-        try:
-            with open(os.path.join(DATA_ROOT, options['filename']),
-                      'r') as f:
-                data = csv.reader(f)
-                for row in data:
-                    name, measurement_unit = row
-                    Ingredient.objects.get_or_create(
-                        name=name, measurement_unit=measurement_unit
-                    )
-                self.stdout.write(
-                    self.style.SUCCESS('=== Ингредиенты успешно загружены ===')
-                )
-        except FileNotFoundError:
-            raise CommandError('Добавьте файл ingredients в директорию data')
+        csv_path=options['path'] or str(
+             Path(settings.BASE_BIR) / 'data',
+        )
+
+        self.import_csv_data(
+             csv_path,
+             'ingredients.csv',
+             self.import_ingredients
+        )
+        self.stdout.write(
+            self.style.SUCCESS('=== Ингредиенты успешно загружены ===')
+            )
+
+    def import_csv_data(self, csv_path, filename, import_func):
+        file_path = Path(csv_path) / filename
+        with open(file_path, 'r') as file:
+            csv_data = csv.DictReader(file)
+            import_func(csv_data)
+
+    def import_ingredients(self, csv_data):
+        ingredients = [Ingredient(
+            name=row['name'],
+            measurement_unit=row.get('measurement_unit', '')
+        )for row in csv_data
+        ]
+        Ingredient.objects.bulk_create(ingredients)

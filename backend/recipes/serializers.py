@@ -1,5 +1,5 @@
-from django.shortcuts import get_object_or_404
 from django.forms import ValidationError
+from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
     IntegerField,
@@ -217,8 +217,10 @@ class RecipeCreateSerializer(ModelSerializer):
     def create_recipe_ingredients(ingredients, recipe):
         ingredient_list = []
         for ingredient in ingredients:
-            current_ingredient = get_object_or_404(Ingredient,
-                                               id=ingredient.get('id'))
+            current_ingredient = get_object_or_404(
+                Ingredient,
+                id=ingredient.get('id')
+            )
             amount = ingredient.get('amount')
             ingredient_list.append(
                 RecipeIngredient(

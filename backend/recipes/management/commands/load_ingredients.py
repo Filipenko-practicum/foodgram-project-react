@@ -19,7 +19,7 @@ class Command(BaseCommand):
                 for line in jsondata:
                     if not Tag.objects.filter(
                             slug=line['slug']).exists():
-                        Tag.objects.create(
+                        Tag.objects.get_or_create(
                             name=line['name'],
                             color=line['color'],
                             slug=line['slug'],
@@ -30,7 +30,7 @@ class Command(BaseCommand):
                             name=line['name'],
                             measurement_unit=line[
                                 'measurement_unit']).exists():
-                        Ingredient.objects.create(
+                        Ingredient.objects.get_or_create(
                             name=line['name'],
                             measurement_unit=line['measurement_unit']
                         )

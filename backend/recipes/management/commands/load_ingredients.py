@@ -1,8 +1,8 @@
-import json
-
+import csv
+from pathlib import Path
+from django.conf import settings
 from django.core.management.base import BaseCommand
-
-from recipes.models import Ingredient, Tag
+from recipes.models import Ingredient
 
 
 class Command(BaseCommand):
@@ -11,26 +11,31 @@ class Command(BaseCommand):
         parser.add_argument("--path", type=str, help="file path")
 
     def handle(self, *args, **options):
-        file_path = options["path"]
+        csv_path = options["path"] or str(
+            Path(settings.BASE_DIR) / 'data'
+        )
 
-        with open(file_path, encoding='cp1251') as f:
-            jsondata = json.load(f)
-            if 'color' in jsondata[0]:
-                for line in jsondata:
-                    if not Tag.objects.filter(
-                            slug=line['slug']).exists():
-                        Tag.objects.get_or_create(
-                            name=line['name'],
-                            color=line['color'],
-                            slug=line['slug'],
-                        )
-            elif 'measurement_unit' in jsondata[0]:
-                for line in jsondata:
-                    if not Ingredient.objects.filter(
-                            name=line['name'],
-                            measurement_unit=line[
-                                'measurement_unit']).exists():
-                        Ingredient.objects.get_or_create(
-                            name=line['name'],
-                            measurement_unit=line['measurement_unit']
-                        )
+        self.import_cvv_data(
+            csv_path,
+            'ingredients.csv',
+            self.import_ingredients
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                'Ингредиенты импортированы!'
+            )
+        )
+
+    def import_csv_data(self, csv_path, filename, import_func):
+        file_path = Path(csv_path) / filename
+        with open(file_path, 'r') as file:
+            csv_data = csv.DictReader(file)
+            import_func(csv_data)
+
+    def import_ingredients(self, csv_data):
+        ingredients = [Ingredient(
+            name=row['name'],
+            measurement_unit=row.get('measurement_unit', '')
+        )for row in csv_data
+        ]
+        Ingredient.objects.bulk_create(ingredients)

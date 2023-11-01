@@ -1,5 +1,11 @@
-from django.contrib import admin
+import csv
 
+from django.contrib import admin, messages
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import path, reverse
+
+from .forms import IngredientImportForm, TagImportForm
 from .models import (
     Favorite,
     Ingredient,
@@ -16,6 +22,36 @@ class IngredientAdmin(admin.ModelAdmin):
     model = Ingredient
     list_display = ('pk', 'name', 'measurement_unit')
     search_fields = ('name', 'measurement_unit')
+
+    def get_urls(self):
+        urls = super().get_urls()
+        urls.insert(-1, path('csv-upload/', self.upload_csv))
+        return urls
+
+    def upload_csv(self, request):
+        if request.method == 'POST':
+            form = IngredientImportForm(request.POST, request.FILES)
+            if form.is_valid():
+                form_object = form.save()
+                with open(
+                    form_object.csv_file.path, encoding='utf-8'
+                ) as csv_file:
+                    rows = csv.reader(csv_file, delimiter=',')
+                    if next(rows) != ['name', 'measurement_unit']:
+                        messages.warning(request, 'Неверные заголовки у файла')
+                        return HttpResponseRedirect(request.path_info)
+                    Ingredient.objects.bulk_create(
+                        Ingredient(
+                            name=row[0],
+                            measurement_unit=row[1],
+                        )
+                        for row in rows
+                    )
+                url = reverse('admin:index')
+                messages.success(request, 'Файл успешно импортирован')
+                return HttpResponseRedirect(url)
+        form = IngredientImportForm()
+        return render(request, 'admin/csv_import_page.html', {'form': form})
 
 
 class IngredientsInline(admin.TabularInline):
@@ -93,6 +129,37 @@ class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'color', 'slug')
     list_editable = ('color',)
     empty_value_display = '-пусто-'
+
+    def get_urls(self):
+        urls = super().get_urls()
+        urls.insert(-1, path('csv-upload/', self.upload_csv))
+        return urls
+
+    def upload_csv(self, request):
+        if request.method == 'POST':
+            form = TagImportForm(request.POST, request.FILES)
+            if form.is_valid():
+                form_object = form.save()
+                with open(
+                    form_object.csv_file.path, encoding='utf-8'
+                ) as csv_file:
+                    rows = csv.reader(csv_file, delimiter=',')
+                    if next(rows) != ['name', 'color', 'slug']:
+                        messages.warning(request, 'Неверные заголовки у файла')
+                        return HttpResponseRedirect(request.path_info)
+                    Tag.objects.bulk_create(
+                        Tag(
+                            name=row[0],
+                            color=row[1],
+                            slug=row[2]
+                        )
+                        for row in rows
+                    )
+                url = reverse('admin:index')
+                messages.success(request, 'Файл успешно импортирован')
+                return HttpResponseRedirect(url)
+        form = TagImportForm()
+        return render(request, 'admin/csv_import_page.html', {'form': form})
 
 
 admin.site.register(Recipe, RecipeAdmin)

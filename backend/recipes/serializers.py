@@ -6,7 +6,6 @@ from rest_framework.serializers import (
     PrimaryKeyRelatedField,
     ReadOnlyField,
     SerializerMethodField,
-    StringRelatedField,
 )
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -58,11 +57,9 @@ class IngredienSerializer(ModelSerializer):
 class RecipeIngredientSerializer(ModelSerializer):
     """Сериалайзер для рецепта с ингредиентами"""
 
-    id = IntegerField(source='ingredient.id')
-    name = StringRelatedField(source='ingredient.name')
-    measurement_unit = StringRelatedField(
-        source='ingredient.measurement_unit'
-    )
+    id = ReadOnlyField(source='ingredient.id')
+    name = ReadOnlyField(source='ingredient.name')
+    measurement_unit = ReadOnlyField(source='ingredient.measurement_unit')
 
     class Meta:
         model = RecipeIngredient
@@ -173,7 +170,7 @@ class RecipeCreateSerializer(ModelSerializer):
     tags = PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all())
     cooking_time = IntegerField(min_value=1, max_value=1000)
     ingredients = HowIngredientSerilizer(
-        many=True
+        many=True,
     )
     image = Base64ImageField()
 

@@ -13,6 +13,17 @@ from foodgram.constants import (
 from users.models import User
 
 
+class ImportIngredient(models.Model):
+    """Модель импорта ингридиентов."""
+
+    csv_file = models.FileField(upload_to='uploads/')
+    date_added = models.DateTimeField(auto_now_add=True)
+
+
+class ImportTag(ImportIngredient):
+    """Модель импорта ингридиентов."""
+
+
 class Tag(models.Model):
     """Модель Тегов."""
 

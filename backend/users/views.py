@@ -49,7 +49,9 @@ class UserViewSet(UserViewSet):
             Доступно только авторизованным пользователям."""
         user = request.user
         data = {'user': user.id, 'author': id}
-        serializer = AddSubscribedSerializer(data=data, context={'request': request})
+        serializer = AddSubscribedSerializer(
+            data=data, context={'request': request}
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return response.Response(
@@ -61,7 +63,9 @@ class UserViewSet(UserViewSet):
     def delete_subscribe(self, request, id):
         """Отписываемся от пользователя."""
         try:
-            subscribed_user = Subscribed.objects.get(user=request.user, author=id)
+            subscribed_user = Subscribed.objects.get(
+                user=request.user, author=id
+            )
             subscribed_user.delete()
             return response.Response(
                 {'detail': 'Отписались от пользователя'},

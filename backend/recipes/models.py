@@ -149,8 +149,8 @@ class Recipe(models.Model):
             UniqueConstraint(
                 fields=("name", "author"),
                 name="unique_for_author"
-                ),
-            ]
+            ),
+        ]
 
     def __str__(self):
         return self.name
@@ -201,8 +201,10 @@ class UserRecipeRelation(models.Model):
     """
     Модель, представляющая связь подписок между пользователем и рецептом.
     Поля:
-    - user: внешний ключ к модели User, представляющий пользователя, который подписан на рецепт.
-    - recipe: внешний ключ к модели Recipe, представляющий рецепт, на который пользователь подписан."""
+    - user: внешний ключ к модели User, представляющий пользователя,
+            который подписан на рецепт.
+    - recipe: внешний ключ к модели Recipe, представляющий рецепт,
+              на который пользователь подписан."""
 
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name='Пользователь'

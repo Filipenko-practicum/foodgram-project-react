@@ -107,8 +107,8 @@ class HowIngredientSerilizer(ModelSerializer):
         queryset=Ingredient.objects.all()
     )
     amount = IntegerField(
-        min_value = MIN_VALUE_COUNT,
-        max_value = MAX_NUMBER_INGR,
+        min_value=MIN_VALUE_COUNT,
+        max_value=MAX_NUMBER_INGR,
     )
 
     class Meta:
@@ -162,7 +162,9 @@ class RecipeCreateSerializer(ModelSerializer):
 
     author = UserSerializer(read_only=True)
     tags = PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all())
-    cooking_time = IntegerField(min_value=MIN_VALUE_COUNT, max_value=MAX_VALUE_COUNT)
+    cooking_time = IntegerField(
+        min_value=MIN_VALUE_COUNT, max_value=MAX_VALUE_COUNT
+    )
     ingredients = HowIngredientSerilizer(
         many=True,
     )
@@ -185,7 +187,7 @@ class RecipeCreateSerializer(ModelSerializer):
         """Именной валидатор для проверки картинки"""
         if not image:
             raise ValidationError(
-                {'error':'Нужна картинка, пустым не должно быть!'}
+                {'error': 'Нужна картинка, пустым не должно быть!'}
             )
         return image
 
@@ -238,8 +240,6 @@ class RecipeCreateSerializer(ModelSerializer):
         """Редактирование рецепта."""
 
         instance.ingredients.clear()
-        ingredients = validated_data.pop('ingredients')
-        tags = validated_data.pop('tags')
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):

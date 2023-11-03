@@ -117,7 +117,9 @@ class RecipeAdmin(admin.ModelAdmin):
 
     @admin.display(description='Ингредиенты')
     def get_ingredients(self, obj):
-        return ', '.join([ingredient.name for ingredient in obj.ingredients.all()])
+        return ', '.join(
+            [ingredient.name for ingredient in obj.ingredients.all()]
+        )
 
     @admin.display(description='Картинка')
     def get_image(self, obj):

@@ -21,7 +21,7 @@ class UserAdmin(BaseUserAdmin):
 
     def get_subscriber_count(self, obj):
         return obj.subscribe_set.count()
- 
+
 
 class SubscribedAdmin(admin.ModelAdmin):
     """
@@ -30,6 +30,7 @@ class SubscribedAdmin(admin.ModelAdmin):
     list_display = ('user', 'author')
     list_filter = ('author',)
     search_fields = ('user',)
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Subscribed, SubscribedAdmin)

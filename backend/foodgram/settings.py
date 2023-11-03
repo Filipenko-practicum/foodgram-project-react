@@ -19,7 +19,6 @@ ALLOWED_HOSTS = os.getenv(
 ).split(',')
 
 
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

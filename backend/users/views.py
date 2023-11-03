@@ -1,12 +1,16 @@
 from djoser.views import UserViewSet as UserViewSet
 from rest_framework import response, status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 
-from api.serializers import AddSubscribedSerializer, SubscribedSerializer
 from api.pagination import LimitPageNumberPagination
-from .serializers import UserSerializer
+from api.serializers import AddSubscribedSerializer, SubscribedSerializer
+
 from .models import Subscribed, User
+from .serializers import UserSerializer
 
 
 class UserViewSet(UserViewSet):

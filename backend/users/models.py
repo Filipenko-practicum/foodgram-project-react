@@ -1,11 +1,10 @@
 from django.contrib.auth.models import AbstractUser
-from django.db.models import CheckConstraint, F, Q
 from django.db import models
+from django.db.models import CheckConstraint, F, Q
 
+from foodgram.constants import MAX_VALUE_LENGTH_USER
 from users.validate import validate_username
-from foodgram.constants import (
-    MAX_VALUE_LENGTH_USER,
-)
+
 
 class User(AbstractUser):
     """Абстрактная модель пользователя."""

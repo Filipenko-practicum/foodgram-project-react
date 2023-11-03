@@ -1,5 +1,5 @@
-from django.forms import ValidationError
 from django.db import transaction
+from django.forms import ValidationError
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
     IntegerField,
@@ -10,13 +10,10 @@ from rest_framework.serializers import (
 )
 from rest_framework.validators import UniqueTogetherValidator
 
-from users.models import Subscribed
-from users.serializers import UserSerializer
-
-from foodgram.constants import(
+from foodgram.constants import (
     MAX_NUMBER_INGR,
-    MIN_VALUE_COUNT,
     MAX_VALUE_COUNT,
+    MIN_VALUE_COUNT,
 )
 from recipes.models import (
     Favorite,
@@ -26,6 +23,8 @@ from recipes.models import (
     ShoppingCart,
     Tag,
 )
+from users.models import Subscribed
+from users.serializers import UserSerializer
 
 
 class TagSerializer(ModelSerializer):

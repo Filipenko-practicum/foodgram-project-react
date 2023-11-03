@@ -1,34 +1,25 @@
 from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
+from djoser.views import UserViewSet as UserViewSet
 from rest_framework import response, status
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
-from recipes.serializers import AddSubscribedSerializer, SubscribedSerializer
-from users.pagination import LimitPageNumberPagination
-
+from api.serializers import AddSubscribedSerializer, SubscribedSerializer
+from api.pagination import LimitPageNumberPagination
+from .serializers import UserSerializer
 from .models import Subscribed, User
 
 
 class UserViewSet(UserViewSet):
-    from .serializers import UserSerializer
     queryset = User.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = UserSerializer
     pagination_class = LimitPageNumberPagination
 
-    @staticmethod
-    def adding_author(add_serializer, model, request, author_id):
-        """Кастомный метод добавления author и получения данных"""
-        user = request.user
-        data = {'user': user.id, 'author': author_id}
-        serializer = add_serializer(data=data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return response.Response(
-            serializer.to_representation(serializer.instance),
-            status=status.HTTP_201_CREATED,
-        )
+    def get_permissions(self):
+        if self.action == 'me':
+            return [IsAuthenticated()]
+        return super().get_permissions()
 
     @action(
         detail=False, methods=['get'], permission_classes=(IsAuthenticated,)
@@ -52,17 +43,29 @@ class UserViewSet(UserViewSet):
     )
     def subscribe(self, request, id):
         """Подписываем пользователя.
-        Доступно только авторизованным пользователям.
-        """
-        return self.adding_author(
-            AddSubscribedSerializer, Subscribed, request, id
+            Доступно только авторизованным пользователям."""
+        user = request.user
+        data = {'user': user.id, 'author': id}
+        serializer = AddSubscribedSerializer(data=data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return response.Response(
+            serializer.to_representation(serializer.instance),
+            status=status.HTTP_201_CREATED,
         )
 
     @subscribe.mapping.delete
     def delete_subscribe(self, request, id):
         """Отписываемся от пользователя."""
-        get_object_or_404(Subscribed, user=request.user, author=id).delete()
-        return response.Response(
-            {'detail': 'Отписались от пользователя'},
-            status=status.HTTP_204_NO_CONTENT
-        )
+        try:
+            subscribed_user = Subscribed.objects.get(user=request.user, author=id)
+            subscribed_user.delete()
+            return response.Response(
+                {'detail': 'Отписались от пользователя'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except Subscribed.DoesNotExist:
+            return response.Response(
+                {'detail': 'Подписка не найдена'},
+                status=status.HTTP_400_BAD_REQUEST
+            )

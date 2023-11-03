@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 
 from django.db.models import Sum
-from django.http import HttpResponse
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import response, status
@@ -18,7 +18,7 @@ from recipes.models import (
     ShoppingCart,
     Tag,
 )
-from recipes.serializers import (
+from api.serializers import (
     FavoriteSerializer,
     IngredienSerializer,
     RecipeCreateSerializer,
@@ -26,8 +26,7 @@ from recipes.serializers import (
     ShoppingCartSerializer,
     TagSerializer,
 )
-from users.pagination import LimitPageNumberPagination
-
+from .pagination import LimitPageNumberPagination
 from .filters import IngredientSearchFilter, RecipeFilter
 from .permissions import IsOwnerOrAdminOrReadOnly
 
@@ -55,14 +54,18 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 class RecipeViewSet(ModelViewSet):
     """Вью сет для рецептов."""
 
-    queryset = Recipe.objects.all()
+    queryset = Recipe.objects.all().select_related(
+        'author'
+    ).prefetch_related(
+        'tags', 'ingredients'
+    )
     permission_classes = (IsOwnerOrAdminOrReadOnly,)
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
     pagination_class = LimitPageNumberPagination
 
     def get_serializer_class(self):
-        """Метод определения сереолайзера"""
+        """Метод определения сереолайзера."""
 
         if self.action in ('list', 'retrieve'):
             return RecipeListSerializer
@@ -82,7 +85,7 @@ class RecipeViewSet(ModelViewSet):
 
     @staticmethod
     def create_shopping_cart_file(self, request, ingredients):
-        """Кастомный метод создания списка покупок"""
+        """Кастомный метод создания списка покупок."""
         user = self.request.user
         filename = f'{user.username}_{FILE_NAME}'
         today = dt.today()
@@ -99,7 +102,7 @@ class RecipeViewSet(ModelViewSet):
             ]
         )
         shopping_list += f'\n\nFoodgram ({today:%Y})'
-        response = HttpResponse(
+        response = FileResponse(
             shopping_list, content_type='text.txt; charset=utf-8'
         )
         response['Content-Disposition'] = f'attachment; filename={filename}'
@@ -113,12 +116,13 @@ class RecipeViewSet(ModelViewSet):
 
     @favorite.mapping.delete
     def remove_from_favorite(self, request, pk):
-        """Метод удаления избраного"""
-        get_object_or_404(Favorite, user=request.user, recipe=pk).delete()
-        return response.Response(
-            {'detail': 'Рецепт удалён'},
-            status=status.HTTP_204_NO_CONTENT,
-        )
+        """Метод удаления избраного."""
+        queryset = Favorite.objects.filter(user=request.user, recipe=pk)
+        if queryset.exists():
+            queryset.delete()
+            return response.Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=True,
@@ -127,22 +131,26 @@ class RecipeViewSet(ModelViewSet):
         pagination_class=None,
     )
     def shopping_cart(self, request, pk):
-        """Метод добавления рецепта в корзину"""
+        """Метод добавления рецепта в корзину."""
         return self.adding_recipe(
             ShoppingCartSerializer, ShoppingCart, request, pk
         )
 
     @shopping_cart.mapping.delete
     def remove_from_shopping_cart(self, request, pk):
-        """Метод удаления из корзины"""
-        get_object_or_404(ShoppingCart, user=request.user, recipe=pk).delete()
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+        """Метод удаления из корзины."""
+        queryset = ShoppingCart.objects.filter(user=request.user, recipe=pk)
+        if queryset.exists():
+            queryset.delete()
+            return response.Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=False, methods=['get'], permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
-        """Метод получения списка покупок"""
+        """Метод получения списка покупок."""
         ingredients = (
             RecipeIngredient.objects.filter(
                 recipe__shoppingcart__user=self.request.user

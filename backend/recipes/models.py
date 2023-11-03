@@ -1,5 +1,6 @@
 from colorfield.fields import ColorField
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models import UniqueConstraint
 from django.db import models
 
 from foodgram.constants import (
@@ -9,6 +10,11 @@ from foodgram.constants import (
     MAX_TIME_COOK,
     MIN_INGREDIENT,
     MIN_TIME_COOK,
+    MAX_LENGTH,
+    MAX_LENGTH_COLOR,
+    MIN_VALUE,
+    MAX_VALUE,
+    MAX_AMOUNT,
 )
 from users.models import User
 
@@ -29,7 +35,7 @@ class Tag(models.Model):
 
     name = models.CharField(
         'Название Тега',
-        max_length=200,
+        max_length=MAX_LENGTH,
         unique=True,
         error_messages={
             'unique': 'Тег с таким именем уже существует.',
@@ -37,7 +43,7 @@ class Tag(models.Model):
     )
     color = ColorField(
         'Цвет в HeX',
-        max_length=7,
+        max_length=MAX_LENGTH_COLOR,
         unique=True,
         error_messages={
             'unique': 'Такой цвет уже существует.',
@@ -47,7 +53,7 @@ class Tag(models.Model):
     )
     slug = models.CharField(
         'Уникальный Тег',
-        max_length=200,
+        max_length=MAX_LENGTH,
         unique=True,
         error_messages={
             'unique': 'Такой Slug уже существует.',
@@ -68,7 +74,7 @@ class Ingredient(models.Model):
 
     name = models.CharField(
         'Название',
-        max_length=200,
+        max_length=MAX_LENGTH,
         db_index=True,
         error_messages={
             'unique': 'Такой ингредиент уже есть.',
@@ -76,13 +82,18 @@ class Ingredient(models.Model):
     )
     measurement_unit = models.CharField(
         'Единица измерения',
-        max_length=200,
+        max_length=MAX_LENGTH,
     )
 
     class Meta:
-        ordering = ['name']
+        ordering = ('name')
         verbose_name = "ингредиент"
         verbose_name_plural = "ингредиенты"
+        constraints = [
+            UniqueConstraint(
+                fields=['name', 'measurement_unit'],
+                name='ingredient_name_unit_unique'
+            )],
 
     def __str__(self):
         return f'{self.name},в {self.measurement_unit}'
@@ -106,17 +117,17 @@ class Recipe(models.Model):
     )
     name = models.CharField(
         'Название блюда',
-        max_length=200,
+        max_length=MAX_LENGTH,
     )
     text = models.TextField(
         'Описание',
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления, мин',
-        default=1,
+        default=MIN_VALUE,
         validators=[
-            MinValueValidator(1, message=MIN_TIME_COOK),
-            MaxValueValidator(360, message=MAX_TIME_COOK),
+            MinValueValidator(MIN_VALUE, message=MIN_TIME_COOK),
+            MaxValueValidator(MAX_VALUE, message=MAX_TIME_COOK),
         ],
     )
     author = models.ForeignKey(
@@ -133,6 +144,11 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        constraints = [
+            UniqueConstraint(
+                fields=("name", "author"),
+                name="unique_for_author",)
+            ],
 
     def __str__(self):
         return self.name
@@ -157,10 +173,10 @@ class RecipeIngredient(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         'Количество',
-        default=1,
+        default=MIN_VALUE,
         validators=[
-            MinValueValidator(1, message=MIN_INGREDIENT),
-            MaxValueValidator(1000, message=MAX_INGREDIENT),
+            MinValueValidator(MIN_VALUE, message=MIN_INGREDIENT),
+            MaxValueValidator(MAX_AMOUNT, message=MAX_INGREDIENT),
         ],
     )
 
@@ -168,13 +184,22 @@ class RecipeIngredient(models.Model):
         ordering = ('recipe',)
         verbose_name = 'Ингредиенты в рецепте'
         verbose_name_plural = 'Ингредиенты в рецептах'
+        constraints = [
+            UniqueConstraint(
+                fields=['recipe', 'ingredient']
+            )
+        ]
 
     def __str__(self):
         return f'{self.recipe} содержит ингредиенты {self.ingredient}'
 
 
-class UserRelation(models.Model):
-    """Связь подписок"""
+class UserRecipeRelation(models.Model):
+    """
+    Модель, представляющая связь подписок между пользователем и рецептом.
+    Поля:
+    - user: внешний ключ к модели User, представляющий пользователя, который подписан на рецепт.
+    - recipe: внешний ключ к модели Recipe, представляющий рецепт, на который пользователь подписан."""
 
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name='Пользователь'
@@ -184,7 +209,6 @@ class UserRelation(models.Model):
     )
 
     class Meta:
-        ordering = ('id',)
         abstract = True
         constraints = [
             models.UniqueConstraint(
@@ -196,21 +220,21 @@ class UserRelation(models.Model):
         return f'{self.user.username} - {self.recipe.id}'
 
 
-class Favorite(UserRelation):
+class Favorite(UserRecipeRelation):
     """Подписка на избранное"""
 
-    class Meta(UserRelation.Meta):
+    class Meta(UserRecipeRelation.Meta):
         default_related_name = 'favorite'
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
 
 
-class ShoppingCart(UserRelation):
+class ShoppingCart(UserRecipeRelation):
     """Рецепты в корзине покупок.
     Модель связывает Recipe и User
     """
 
-    class Meta(UserRelation.Meta):
+    class Meta(UserRecipeRelation.Meta):
         default_related_name = 'shoppingcart'
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзина'

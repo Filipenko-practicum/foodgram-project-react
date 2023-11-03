@@ -4,6 +4,7 @@ from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import path, reverse
+from django.utils.safestring import mark_safe
 
 from .forms import IngredientImportForm, TagImportForm
 from .models import (
@@ -60,16 +61,8 @@ class IngredientsInline(admin.TabularInline):
     Сразу доступно добавление 3х ингрдиентов.
     """
     model = RecipeIngredient
+    min_num = 1
     extra = 3
-
-
-class FollowAdmin(admin.ModelAdmin):
-    """
-    Админ-зона подписок.
-    """
-    list_display = ('user', 'author')
-    list_filter = ('author',)
-    search_fields = ('user',)
 
 
 class FavouriteAdmin(admin.ModelAdmin):
@@ -107,18 +100,28 @@ class RecipeAdmin(admin.ModelAdmin):
         'id',
         'author',
         'name',
+        'is_favorite',
+        'get_ingredients',
+        'get_image',
     )
     fields = ('name', 'author', 'text', 'image', 'tags')
     search_fields = ('name', 'author', 'tags')
     list_filter = ('name', 'author', 'tags')
     inlines = (IngredientsInline,)
     empty_value_display = '- пусто -'
-    filter_horizontal = ("tags",)
+    filter_horizontal = ('tags',)
 
+    @admin.display(description='Добавленные рецепты в избранное')
     def in_favorite(self, obj):
         return obj.favorite.all().count()
 
-    in_favorite.short_description = 'Добавленные рецепты в избранное'
+    @admin.display(description='Ингредиенты')
+    def get_ingredients(self, obj):
+        return ', '.join([ingredient.name for ingredient in obj.ingredients.all()])
+
+    @admin.display(description='Картинка')
+    def get_image(self, obj):
+        return mark_safe(f'<img src={obj.image.url} width="80" height="60">')
 
 
 class TagAdmin(admin.ModelAdmin):

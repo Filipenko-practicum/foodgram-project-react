@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
-        return bool(
+        return (
             user.is_authenticated
             and obj.subscribing.filter(user=user).exists()
         )

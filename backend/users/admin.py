@@ -10,7 +10,7 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('id', 'username', 'first_name',
                     'last_name', 'email',
                     'get_recipe_count',
-                    'get_subscribe_count',)
+                    'get_subscriber_count',)
     search_fields = ('username', 'email')
     list_filter = ('username', 'email',)
     empty_value_display = '-пусто-'

@@ -100,7 +100,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'id',
         'author',
         'name',
-        'is_favorite',
+        'in_favorite',
         'get_ingredients',
         'get_image',
     )

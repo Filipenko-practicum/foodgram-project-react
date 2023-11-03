@@ -12,8 +12,8 @@ from foodgram.constants import (
     MIN_TIME_COOK,
     MAX_LENGTH,
     MAX_LENGTH_COLOR,
-    MIN_VALUE,
-    MAX_VALUE,
+    MIN_VALUE_COUNT,
+    MAX_VALUE_COUNT,
     MAX_AMOUNT,
 )
 from users.models import User
@@ -86,14 +86,15 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        ordering = ('name')
+        ordering = ('name',)
         verbose_name = "ингредиент"
         verbose_name_plural = "ингредиенты"
         constraints = [
-            UniqueConstraint(
+            models.UniqueConstraint(
                 fields=['name', 'measurement_unit'],
                 name='ingredient_name_unit_unique'
-            )],
+            ),
+        ]
 
     def __str__(self):
         return f'{self.name},в {self.measurement_unit}'
@@ -124,10 +125,10 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления, мин',
-        default=MIN_VALUE,
+        default=MIN_VALUE_COUNT,
         validators=[
-            MinValueValidator(MIN_VALUE, message=MIN_TIME_COOK),
-            MaxValueValidator(MAX_VALUE, message=MAX_TIME_COOK),
+            MinValueValidator(MIN_VALUE_COUNT, message=MIN_TIME_COOK),
+            MaxValueValidator(MAX_VALUE_COUNT, message=MAX_TIME_COOK),
         ],
     )
     author = models.ForeignKey(
@@ -147,8 +148,9 @@ class Recipe(models.Model):
         constraints = [
             UniqueConstraint(
                 fields=("name", "author"),
-                name="unique_for_author",)
-            ],
+                name="unique_for_author"
+                ),
+            ]
 
     def __str__(self):
         return self.name
@@ -173,9 +175,9 @@ class RecipeIngredient(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         'Количество',
-        default=MIN_VALUE,
+        default=MIN_VALUE_COUNT,
         validators=[
-            MinValueValidator(MIN_VALUE, message=MIN_INGREDIENT),
+            MinValueValidator(MIN_VALUE_COUNT, message=MIN_INGREDIENT),
             MaxValueValidator(MAX_AMOUNT, message=MAX_INGREDIENT),
         ],
     )
@@ -185,9 +187,10 @@ class RecipeIngredient(models.Model):
         verbose_name = 'Ингредиенты в рецепте'
         verbose_name_plural = 'Ингредиенты в рецептах'
         constraints = [
-            UniqueConstraint(
-                fields=['recipe', 'ingredient']
-            )
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='recipe_ingredient_unique',
+            ),
         ]
 
     def __str__(self):

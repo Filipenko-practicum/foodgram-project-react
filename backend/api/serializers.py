@@ -15,8 +15,8 @@ from users.serializers import UserSerializer
 
 from foodgram.constants import(
     MAX_NUMBER_INGR,
-    MIN_VALUE,
-    MAX_VALUE,
+    MIN_VALUE_COUNT,
+    MAX_VALUE_COUNT,
 )
 from recipes.models import (
     Favorite,
@@ -107,8 +107,8 @@ class HowIngredientSerilizer(ModelSerializer):
     id = PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all()
     )
-    amount = Ingredient(
-        min_value = MIN_VALUE,
+    amount = IntegerField(
+        min_value = MIN_VALUE_COUNT,
         max_value = MAX_NUMBER_INGR,
     )
 
@@ -163,7 +163,7 @@ class RecipeCreateSerializer(ModelSerializer):
 
     author = UserSerializer(read_only=True)
     tags = PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all())
-    cooking_time = IntegerField(min_value=MIN_VALUE, max_value=MAX_VALUE)
+    cooking_time = IntegerField(min_value=MIN_VALUE_COUNT, max_value=MAX_VALUE_COUNT)
     ingredients = HowIngredientSerilizer(
         many=True,
     )

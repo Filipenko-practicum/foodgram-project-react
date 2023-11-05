@@ -168,7 +168,11 @@ class RecipeListSerializer(ModelSerializer):
         return (
             request
             and request.user.is_authenticated
-            and request.user.favorite
+            and request.user.favorite(
+                Favorite.objects.filter(
+                    user=request.user, recipe=obj.id
+                ).exists()
+            )
         )
 
     def get_is_in_shopping_cart(self, obj):
@@ -176,7 +180,11 @@ class RecipeListSerializer(ModelSerializer):
         return (
             request
             and request.user.is_authenticated
-            and request.user.shoppingcart
+            and request.user.shoppingcart(
+                ShoppingCart.objects.filter(
+                    user=request.user, recipe=obj.id
+                ).exists()
+            )
         )
 
 
@@ -238,7 +246,8 @@ class RecipeCreateSerializer(ModelSerializer):
 
         return data
 
-    def add_ingredients_and_tags(self, tags, ingredients, recipe):
+    @staticmethod
+    def add_ingredients_and_tags(tags, ingredients, recipe):
         recipe.tags.set(tags)
         ingredients_list = []
         for ingredient in ingredients:
@@ -266,9 +275,9 @@ class RecipeCreateSerializer(ModelSerializer):
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
-        return RecipeListSerializer(instance, context={
-            'request': self.context.get('request')
-        }).data
+        return RecipeListSerializer(
+            instance, context=self.context
+        ).data
 
 
 class SubscribedSerializer(UserSerializer):
@@ -303,16 +312,14 @@ class SubscribedSerializer(UserSerializer):
                     'recipes_limit',
                 )
             )
-        except (ValueError, KeyError):
-            raise ValueError('Неверное значение параметра recipes_limit')
-        except AttributeError:
-            raise AttributeError('Отсутствует объект запроса')
+        except (ValueError, KeyError,AttributeError):
+            raise ValueError
         author_recipes = object.recipes.all()[:limit]
         return RecipeSerializer(author_recipes, many=True).data
 
 
 class AddSubscribedSerializer(ModelSerializer):
-    """Сереалайзер добавления подписки"""
+    """Сереалайзер добавления подписки."""
 
     class Meta:
         model = Subscribed
@@ -335,9 +342,8 @@ class AddSubscribedSerializer(ModelSerializer):
         return attrs
 
     def to_representation(self, instance):
-        request = self.context.get('request')
         return SubscribedSerializer(
-            instance.author, context={'request': request}
+            instance.author, context=self.context
         ).data
 
 

@@ -33,7 +33,6 @@ from recipes.models import (
     Tag,
 )
 from users.models import Subscribed, User
-
 from .filters import IngredientSearchFilter, RecipeFilter
 from .pagination import LimitPageNumberPagination
 from .permissions import IsOwnerOrAdminOrReadOnly
@@ -125,12 +124,11 @@ class RecipeViewSet(ModelViewSet):
     @favorite.mapping.delete
     def remove_from_favorite(self, request, pk):
         """Метод удаления избраного."""
-        queryset = Favorite.objects.filter(user=request.user, recipe=pk)
-        if queryset.exists():
-            queryset.delete()
+        favorite_delete = Favorite.objects.filter(user=request.user, recipe=pk)
+        if favorite_delete.exists():
+            favorite_delete.delete()
             return response.Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=True,
@@ -147,12 +145,11 @@ class RecipeViewSet(ModelViewSet):
     @shopping_cart.mapping.delete
     def remove_from_shopping_cart(self, request, pk):
         """Метод удаления из корзины."""
-        queryset = ShoppingCart.objects.filter(user=request.user, recipe=pk)
-        if queryset.exists():
-            queryset.delete()
+        delete_shop_cart = ShoppingCart.objects.filter(user=request.user, recipe=pk)
+        if delete_shop_cart.exists():
+            delete_shop_cart.delete()
             return response.Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=False, methods=['get'], permission_classes=(IsAuthenticated,)

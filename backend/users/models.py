@@ -10,6 +10,12 @@ class User(AbstractUser):
     """Абстрактная модель пользователя."""
 
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = (
+        'username',
+        'first_name',
+        'last_name',
+    )
+
     username = models.CharField(
         'Ваш логин',
         max_length=MAX_VALUE_LENGTH_USER,
@@ -32,12 +38,6 @@ class User(AbstractUser):
     )
     last_name = models.CharField(
         'Фамилия', max_length=MAX_VALUE_LENGTH_USER
-    )
-
-    REQUIRED_FIELDS = (
-        'username',
-        'first_name',
-        'last_name',
     )
 
     class Meta:

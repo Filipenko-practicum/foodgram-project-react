@@ -1,20 +1,27 @@
 from datetime import datetime as dt
-
 from django.db.models import Sum
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import response, status
+from rest_framework import response, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from api.serializers import (
+    AddSubscribedSerializer,
     FavoriteSerializer,
     IngredienSerializer,
     RecipeCreateSerializer,
     RecipeListSerializer,
     ShoppingCartSerializer,
+    SubscribedSerializer,
     TagSerializer,
+    UserSerializer,
 )
 from foodgram.constants import FILE_NAME
 from recipes.models import (
@@ -25,6 +32,7 @@ from recipes.models import (
     ShoppingCart,
     Tag,
 )
+from users.models import Subscribed, User
 
 from .filters import IngredientSearchFilter, RecipeFilter
 from .pagination import LimitPageNumberPagination
@@ -160,3 +168,69 @@ class RecipeViewSet(ModelViewSet):
             .annotate(amount=Sum('amount'))
         )
         return self.create_shopping_cart_file(self, request, ingredients)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    serializer_class = UserSerializer
+    pagination_class = LimitPageNumberPagination
+
+    def get_permissions(self):
+        if self.action == 'me':
+            return [IsAuthenticated()]
+        return super().get_permissions()
+
+    @action(
+        detail=False, methods=['get'], permission_classes=(IsAuthenticated,)
+    )
+    def subscriptions(self, request):
+        """Возвращает пользователей, на которых подписан текущий пользователь.
+        В выдачу добавляются рецепты.
+        """
+        return self.get_paginated_response(
+            SubscribedSerializer(
+                self.paginate_queryset(
+                    User.objects.filter(subscribing__user=request.user)
+                ),
+                many=True,
+                context={'request': request},
+            ).data
+        )
+
+    @action(
+        detail=True, methods=['post'], permission_classes=[IsAuthenticated]
+    )
+    def subscribe(self, request, id):
+        """Подписываем пользователя.
+            Доступно только авторизованным пользователям."""
+        user = request.user
+        data = {'user': user.id, 'author': id}
+        serializer = AddSubscribedSerializer(
+            data=data, context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            serializer.to_representation(serializer.instance),
+            status=status.HTTP_201_CREATED,
+        )
+
+    @subscribe.mapping.delete
+    def delete_subscribe(self, request, id):
+        """Отписываемся от пользователя."""
+        subscribed_user = Subscribed.objects.filter(
+            user=request.user,
+            author=id,
+        )
+        if subscribed_user.exists():
+            subscribed_user.delete()
+            return Response(
+                {'detail': 'Отписались от пользователя'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        else:
+            return Response(
+                {'detail': 'Подписка не найдена'},
+                status=status.HTTP_400_BAD_REQUEST
+            )

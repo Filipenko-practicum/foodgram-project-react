@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.forms import ValidationError
+from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
     IntegerField,
@@ -23,8 +24,7 @@ from recipes.models import (
     ShoppingCart,
     Tag,
 )
-from users.models import Subscribed
-from users.serializers import UserSerializer
+from users.models import Subscribed, User
 
 
 class TagSerializer(ModelSerializer):
@@ -114,6 +114,29 @@ class HowIngredientSerilizer(ModelSerializer):
     class Meta:
         model = RecipeIngredient
         fields = ('id', 'amount')
+
+
+class UserSerializer(ModelSerializer):
+    """Сериалайзер Юзера."""
+    is_subscribed = SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed'
+        )
+
+    def get_is_subscribed(self, obj):
+        user = self.context.get('request').user
+        return (
+            user.is_authenticated
+            and obj.subscribing.filter(user=user).exists()
+        )
 
 
 class RecipeListSerializer(ModelSerializer):
@@ -316,3 +339,18 @@ class AddSubscribedSerializer(ModelSerializer):
         return SubscribedSerializer(
             instance.author, context={'request': request}
         ).data
+
+
+class UserRegistrationSerializer(UserCreateSerializer):
+    """Сереалайзер регистрации."""
+
+    class Meta(UserCreateSerializer.Meta):
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'password',
+        )

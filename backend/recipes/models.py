@@ -49,7 +49,6 @@ class Tag(models.Model):
             'unique': 'Такой цвет уже существует.',
         },
         default=DEFAULT_COLOR,
-        null=True,
     )
     slug = models.CharField(
         'Уникальный Тег',
@@ -147,7 +146,7 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
         constraints = [
             UniqueConstraint(
-                fields=("name", "author"),
+                fields=('name',' author'),
                 name="unique_for_author"
             ),
         ]
@@ -226,7 +225,7 @@ class UserRecipeRelation(models.Model):
 
 
 class Favorite(UserRecipeRelation):
-    """Подписка на избранное"""
+    """Подписка на избранное."""
 
     class Meta(UserRecipeRelation.Meta):
         default_related_name = 'favorite'

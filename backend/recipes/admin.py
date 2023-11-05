@@ -111,7 +111,7 @@ class RecipeAdmin(admin.ModelAdmin):
     empty_value_display = '- пусто -'
     filter_horizontal = ('tags',)
 
-    @admin.display(description='Добавленные рецепты в избранное')
+    @admin.display(description='Избранное')
     def in_favorite(self, obj):
         return obj.favorite.all().count()
 

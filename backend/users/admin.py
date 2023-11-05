@@ -16,9 +16,11 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('username', 'email',)
     empty_value_display = '-пусто-'
 
+    @admin.display(description='Количество рецептов')
     def get_recipe_count(self, obj):
         return obj.recipe_set.count()
 
+    @admin.display(description='Количество подписчиков')
     def get_subscriber_count(self, obj):
         return obj.subscribe_set.count()
 

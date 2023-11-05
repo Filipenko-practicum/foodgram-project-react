@@ -145,7 +145,9 @@ class RecipeViewSet(ModelViewSet):
     @shopping_cart.mapping.delete
     def remove_from_shopping_cart(self, request, pk):
         """Метод удаления из корзины."""
-        delete_shop_cart = ShoppingCart.objects.filter(user=request.user, recipe=pk)
+        delete_shop_cart = ShoppingCart.objects.filter(
+            user=request.user, recipe=pk
+        )
         if delete_shop_cart.exists():
             delete_shop_cart.delete()
             return response.Response(status=status.HTTP_204_NO_CONTENT)

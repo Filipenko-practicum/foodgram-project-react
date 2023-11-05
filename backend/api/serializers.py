@@ -270,8 +270,12 @@ class RecipeCreateSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         """Редактирование рецепта."""
-
         instance.ingredients.clear()
+        ingredients = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
+        self.add_ingredients_and_tags(
+            tags, ingredients, instance
+        )
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
@@ -309,7 +313,7 @@ class SubscribedSerializer(UserSerializer):
         try:
             limit = int(
                 self.context['request'].query_params.get(
-                    'recipes_limit',
+                    'recipes_limit'
                 )
             )
         except (ValueError, KeyError,AttributeError):

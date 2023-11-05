@@ -316,7 +316,7 @@ class SubscribedSerializer(UserSerializer):
                     'recipes_limit'
                 )
             )
-        except (ValueError, KeyError,AttributeError):
+        except (ValueError, KeyError, AttributeError):
             raise ValueError
         author_recipes = object.recipes.all()[:limit]
         return RecipeSerializer(author_recipes, many=True).data

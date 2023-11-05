@@ -146,7 +146,7 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
         constraints = [
             UniqueConstraint(
-                fields=('name',' author'),
+                fields=('name', 'author'),
                 name="unique_for_author"
             ),
         ]

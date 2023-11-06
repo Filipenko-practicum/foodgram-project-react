@@ -161,8 +161,7 @@ class RecipeListSerializer(ModelSerializer):
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients',
                   'is_favorited', 'is_in_shopping_cart',
-                  'name', 'image', 'text', 'cooking_time') #Женя ты оставил тут комментарий,что половина лишнего.
-                                                            #Но я не пойму почему он лишние?
+                  'name', 'image', 'text', 'cooking_time')
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
@@ -171,8 +170,8 @@ class RecipeListSerializer(ModelSerializer):
             and request.user.is_authenticated
             and Favorite.objects.filter(
                     user=request.user, recipe=obj.id
-                ).exists()
-            )
+                    ).exists()
+                )
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
@@ -180,9 +179,9 @@ class RecipeListSerializer(ModelSerializer):
             request
             and request.user.is_authenticated
             and ShoppingCart.objects.filter(
-                    user=request.user, recipe=obj.id
+                user=request.user, recipe=obj.id
                 ).exists()
-            )
+        )
 
 
 class RecipeCreateSerializer(ModelSerializer):

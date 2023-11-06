@@ -70,7 +70,7 @@ class Subscribed(models.Model):
         verbose_name_plural = 'Подписки'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'author'], name='unique_subscribe'
+                fields=['user', 'following'], name='unique_subscribe'
             ),
             CheckConstraint(
                 check=~Q(following=F('user')), name='No self sibscription'

@@ -16,10 +16,11 @@ class Command(BaseCommand):
             help="file path"
         )
 
-    def handle(self, *args, **options):
-        print('Загрузка началась')
-        file_path = options['path']
+def handle(self, *args, **options):
+    print('Загрузка началась')
+    file_path = options['path']
 
+    try:
         with open(file_path, encoding='utf-8') as f:
             jsondata = json.load(f)
             if 'color' in jsondata[0]:
@@ -51,3 +52,5 @@ class Command(BaseCommand):
                     ]
                     Ingredient.objects.bulk_create(ingredients_to_create)
         print('Загрузка завершена')
+    except FileNotFoundError:
+        print('Ошибка: Файл не найден')

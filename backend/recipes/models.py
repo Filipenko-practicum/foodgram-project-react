@@ -69,7 +69,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    """Модель ингредиент"""
+    """Модель ингредиент."""
 
     name = models.CharField(
         'Название',
@@ -147,7 +147,7 @@ class Recipe(models.Model):
         constraints = [
             UniqueConstraint(
                 fields=('name', 'author'),
-                name="unique_for_author"
+                name='unique_for_author'
             ),
         ]
 

@@ -46,11 +46,11 @@ class Command(BaseCommand):
                                 name=line['name'],
                                 measurement_unit=line['measurement_unit']
                             )
-                        for line in jsondata
-                        if not Ingredient.objects.filter(
-                            name=line['name'],
-                            measurement_unit=line['measurement_unit']
-                        ).exists()
+                            for line in jsondata
+                            if not Ingredient.objects.filter(
+                                name=line['name'],
+                                measurement_unit=line['measurement_unit']
+                            ).exists()
                         ]
                         Ingredient.objects.bulk_create(ingredients_to_create)
             print('Загрузка завершена')

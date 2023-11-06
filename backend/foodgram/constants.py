@@ -5,8 +5,8 @@ MAX_VALUE_COUNT = 360
 DEFAULT_COLOR = '#ffd057'
 FILE_NAME = 'shopping_cart.txt'
 DIRICTORY_PATH = 'recipe_img/'
-MIN_INGREDIENT = f'Количество ингредиентов не может быть меньше
-                {MIN_VALUE_COUNT}'
+MIN_INGREDIENT = (f'Количество ингредиентов не может быть меньше '
+                  f'{MIN_VALUE_COUNT}')
 MAX_INGREDIENT = f'Количество ингредиентов не может быть больше
                 {MAX_NUMBER_INGR}'
 MIN_TIME_COOK = f'Время приготовления не может быть меньше {MIN_VALUE_COUNT}'

@@ -16,7 +16,6 @@ class Command(BaseCommand):
             help="file path"
         )
 
-
     def handle(self, *args, **options):
         print('Загрузка началась')
         file_path = options['path']
@@ -34,7 +33,9 @@ class Command(BaseCommand):
                                 slug=line['slug']
                             )
                             for line in jsondata
-                            if not Tag.objects.filter(slug=line['slug']).exists()
+                            if not Tag.objects.filter(
+                                slug=line['slug']
+                            ).exists()
                         ]
                         Tag.objects.bulk_create(tags_to_create)
                 elif 'measurement_unit' in jsondata[0]:
@@ -42,9 +43,9 @@ class Command(BaseCommand):
                         Ingredient.objects.all().delete()
                         ingredients_to_create = [
                             Ingredient(
-                            name=line['name'],
-                            measurement_unit=line['measurement_unit']
-                        )
+                                name=line['name'],
+                                measurement_unit=line['measurement_unit']
+                            )
                         for line in jsondata
                         if not Ingredient.objects.filter(
                             name=line['name'],

@@ -61,7 +61,7 @@ class Subscribed(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='author',
+        related_name='following',
         verbose_name='Автор',
     )
 
@@ -73,7 +73,7 @@ class Subscribed(models.Model):
                 fields=['user', 'author'], name='unique_subscribe'
             ),
             CheckConstraint(
-                check=~Q(following=F('user')), name='No self sibscription'
+                check=~Q(author=F('user')), name='No self sibscription'
             ),
         ]
 

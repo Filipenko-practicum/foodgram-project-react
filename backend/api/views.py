@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+
 from django.db.models import Sum
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -33,6 +34,7 @@ from recipes.models import (
     Tag,
 )
 from users.models import Subscribed, User
+
 from .filters import IngredientSearchFilter, RecipeFilter
 from .pagination import LimitPageNumberPagination
 from .permissions import IsOwnerOrAdminOrReadOnly
@@ -124,9 +126,9 @@ class RecipeViewSet(ModelViewSet):
     @favorite.mapping.delete
     def remove_from_favorite(self, request, pk):
         """Метод удаления избраного."""
-        favorite_delete = Favorite.objects.filter(user=request.user, recipe=pk)
-        if favorite_delete.exists():
-            favorite_delete.delete()
+        favorite = Favorite.objects.filter(user=request.user, recipe=pk)
+        if favorite.exists():
+            favorite.delete()
             return response.Response(status=status.HTTP_204_NO_CONTENT)
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -211,7 +213,9 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(
-            serializer.to_representation(serializer.instance),
+            Subscribed.objects.filter(
+                author=id, user=request.user
+            ),
             status=status.HTTP_201_CREATED,
         )
 

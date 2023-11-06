@@ -36,7 +36,7 @@ class TagSerializer(ModelSerializer):
 
 
 class RecipeSerializer(ModelSerializer):
-    """Сериалайзер Рецепта"""
+    """Сериалайзер Рецепта."""
 
     class Meta:
         model = Recipe
@@ -56,7 +56,7 @@ class IngredienSerializer(ModelSerializer):
 
 
 class RecipeIngredientSerializer(ModelSerializer):
-    """Сериалайзер для рецепта с ингредиентами"""
+    """Сериалайзер для рецепта с ингредиентами."""
 
     id = ReadOnlyField(source='ingredient.id')
     name = ReadOnlyField(source='ingredient.name')
@@ -68,7 +68,7 @@ class RecipeIngredientSerializer(ModelSerializer):
 
 
 class BaseRelationSerializer(ModelSerializer):
-    """Базовый сериализатор для связей"""
+    """Базовый сериализатор для связей."""
 
     def validate(self, attrs):
         user = attrs['user']
@@ -85,7 +85,7 @@ class BaseRelationSerializer(ModelSerializer):
 
 
 class FavoriteSerializer(BaseRelationSerializer):
-    """Сереалайзер избранного"""
+    """Сереалайзер избранного."""
 
     class Meta:
         model = Favorite
@@ -161,31 +161,28 @@ class RecipeListSerializer(ModelSerializer):
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients',
                   'is_favorited', 'is_in_shopping_cart',
-                  'name', 'image', 'text', 'cooking_time')
+                  'name', 'image', 'text', 'cooking_time') #Женя ты оставил тут комментарий,что половина лишнего.
+                                                            #Но я не пойму почему он лишние?
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         return (
             request
             and request.user.is_authenticated
-            and request.user.favorite(
-                Favorite.objects.filter(
+            and Favorite.objects.filter(
                     user=request.user, recipe=obj.id
                 ).exists()
             )
-        )
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         return (
             request
             and request.user.is_authenticated
-            and request.user.shoppingcart(
-                ShoppingCart.objects.filter(
+            and ShoppingCart.objects.filter(
                     user=request.user, recipe=obj.id
                 ).exists()
             )
-        )
 
 
 class RecipeCreateSerializer(ModelSerializer):
@@ -215,7 +212,7 @@ class RecipeCreateSerializer(ModelSerializer):
         )
 
     def validate_image(self, image):
-        """Именной валидатор для проверки картинки"""
+        """Именной валидатор для проверки картинки."""
         if not image:
             raise ValidationError(
                 {'error': 'Нужна картинка, пустым не должно быть!'}
@@ -223,7 +220,7 @@ class RecipeCreateSerializer(ModelSerializer):
         return image
 
     def validate(self, data):
-        """Метод валидации для создания рецепта"""
+        """Метод валидации для создания рецепта."""
         ingredients = data.get('ingredients')
         tags = data.get('tags')
 
@@ -272,6 +269,7 @@ class RecipeCreateSerializer(ModelSerializer):
         """Редактирование рецепта."""
         instance.ingredients.clear()
         ingredients = validated_data.pop('ingredients')
+        instance.tags.clear()
         tags = validated_data.pop('tags')
         self.add_ingredients_and_tags(
             tags, ingredients, instance
@@ -317,7 +315,7 @@ class SubscribedSerializer(UserSerializer):
                 )
             )
         except (ValueError, KeyError, AttributeError):
-            raise ValueError
+            raise
         author_recipes = object.recipes.all()[:limit]
         return RecipeSerializer(author_recipes, many=True).data
 

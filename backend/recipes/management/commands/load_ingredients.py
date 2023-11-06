@@ -10,8 +10,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "backend/data/ingredients.json",
-            "backen/data/tags.json",
+            'backend/data/ingredients.json',
+            'backen/data/tags.json',
             type=str,
             help="file path"
         )

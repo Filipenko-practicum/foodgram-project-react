@@ -18,11 +18,11 @@ class UserAdmin(BaseUserAdmin):
 
     @admin.display(description='Количество рецептов')
     def get_recipe_count(self, obj):
-        return obj.recipe_set.count()
+        return obj.recipes.count()
 
     @admin.display(description='Количество подписчиков')
     def get_subscriber_count(self, obj):
-        return obj.subscribe_set.count()
+        return obj.subscriber.count()
 
 
 class SubscribedAdmin(admin.ModelAdmin):

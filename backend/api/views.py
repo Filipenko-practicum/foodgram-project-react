@@ -173,7 +173,7 @@ class RecipeViewSet(ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (AllowAny,)
     serializer_class = UserSerializer
     pagination_class = LimitPageNumberPagination
 

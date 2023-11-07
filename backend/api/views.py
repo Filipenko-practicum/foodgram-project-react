@@ -3,7 +3,7 @@ from datetime import datetime as dt
 from django.db.models import Sum
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from djoser.views import UserViewSet as NewUserVuewSet
+from djoser.views import UserViewSet as NewUserViewSet
 from rest_framework import response, status
 from rest_framework.decorators import action
 from rest_framework.permissions import (
@@ -172,7 +172,7 @@ class RecipeViewSet(ModelViewSet):
         return self.create_shopping_cart_file(self, request, ingredients)
 
 
-class UserViewSet(NewUserVuewSet):
+class UserViewSet(NewUserViewSet):
     queryset = User.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = UserSerializer

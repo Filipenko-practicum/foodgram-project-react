@@ -3,8 +3,8 @@ from datetime import datetime as dt
 from django.db.models import Sum
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import response, status
 from djoser.views import UserViewSet as NewUserVuewSet
+from rest_framework import response, status
 from rest_framework.decorators import action
 from rest_framework.permissions import (
     AllowAny,

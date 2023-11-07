@@ -3,11 +3,13 @@ from datetime import datetime as dt
 from django.db.models import Sum
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import response, status, viewsets
+from rest_framework import response, status
+from djoser.views import UserViewSet as NewUserVuewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
 )
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
@@ -170,9 +172,9 @@ class RecipeViewSet(ModelViewSet):
         return self.create_shopping_cart_file(self, request, ingredients)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(NewUserVuewSet):
     queryset = User.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = UserSerializer
     pagination_class = LimitPageNumberPagination
 

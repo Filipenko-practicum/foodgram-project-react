@@ -248,7 +248,7 @@ class RecipeCreateSerializer(ModelSerializer):
         for ingredient in ingredients:
             new_ingredient = RecipeIngredient(
                 recipe=recipe,
-                ingredient_id=ingredient['id'],
+                ingredient=ingredient['id'],
                 amount=ingredient['amount'],
             )
             ingredients_list.append(new_ingredient)

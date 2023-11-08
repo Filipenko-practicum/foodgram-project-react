@@ -1,6 +1,5 @@
 from django.db import transaction
 from django.forms import ValidationError
-from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
     IntegerField,
@@ -346,18 +345,3 @@ class AddSubscribedSerializer(ModelSerializer):
         return SubscribedSerializer(
             instance.author, context=self.context
         ).data
-
-
-class UserRegistrationSerializer(UserCreateSerializer):
-    """Сереалайзер регистрации."""
-
-    class Meta(UserCreateSerializer.Meta):
-        model = User
-        fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'password',
-        )

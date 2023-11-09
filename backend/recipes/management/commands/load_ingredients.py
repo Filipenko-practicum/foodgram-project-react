@@ -10,10 +10,16 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'backend/data/ingredients.json',
-            'backen/data/tags.json',
+            '--ingredients',
+            default='backend/data/ingredients.json',
             type=str,
-            help="file path"
+            help='file path for ingredients data'
+        )
+        parser.add_argument(
+            '--tags',
+            default='backend/data/tags.json',
+            type=str,
+            help='file path for tags data'
         )
 
     def handle(self, *args, **options):

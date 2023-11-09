@@ -80,7 +80,8 @@ class BaseRelationSerializer(ModelSerializer):
         return attrs
 
     def to_representation(self, instance):
-        return RecipeSerializer(instance, context=self.context).data
+        recipe = instance.recipe
+        return RecipeSerializer(recipe, context=self.context).data
 
 
 class FavoriteSerializer(BaseRelationSerializer):
@@ -134,7 +135,7 @@ class UserSerializer(ModelSerializer):
         user = self.context.get('request').user
         return (
             user.is_authenticated
-            and obj.subscriber.filter(user=user).exists()
+            and obj.author.filter(user=user).exists()
         )
 
 
@@ -313,9 +314,14 @@ class SubscribedSerializer(UserSerializer):
                 )
             )
         except (ValueError, KeyError, AttributeError):
+            limit = None
             raise
         author_recipes = object.recipes.all()[:limit]
-        return RecipeSerializer(author_recipes, many=True).data
+        return RecipeSerializer(
+            author_recipes,
+            many=True,
+            context=self.context,
+        ).data
 
 
 class AddSubscribedSerializer(ModelSerializer):

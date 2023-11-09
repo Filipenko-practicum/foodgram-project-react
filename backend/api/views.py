@@ -193,7 +193,7 @@ class UserViewSet(NewUserViewSet):
         return self.get_paginated_response(
             SubscribedSerializer(
                 self.paginate_queryset(
-                    User.objects.filter(subscribing__user=request.user)
+                    User.objects.filter(subscriber__user=request.user)
                 ),
                 many=True,
                 context={'request': request},
@@ -213,10 +213,8 @@ class UserViewSet(NewUserViewSet):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(
-            Subscribed.objects.filter(
-                author=id, user=request.user
-            ),
+        return response.Response(
+            serializer.data,
             status=status.HTTP_201_CREATED,
         )
 
@@ -233,8 +231,7 @@ class UserViewSet(NewUserViewSet):
                 {'detail': 'Отписались от пользователя'},
                 status=status.HTTP_204_NO_CONTENT
             )
-        else:
-            return Response(
-                {'detail': 'Подписка не найдена'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        return Response(
+            {'detail': 'Подписка не найдена'},
+            status=status.HTTP_400_BAD_REQUEST
+        )

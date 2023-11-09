@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 USE_SQLITE = True
-#os.getenv('USE_DB', 'False') == 'True'
+# os.getenv('USE_DB', 'False') == 'True'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'AlexanderFilipenko')
 
 DEBUG = True
-#os.getenv('DEBUG', 'False') == 'True'
+# os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS', default='127.0.0.1,localhost'

@@ -194,7 +194,7 @@ class UserViewSet(NewUserViewSet):
             SubscribedSerializer(
                 self.paginate_queryset(
                     User.objects.filter(
-                        subscriber__user=request.user
+                        following__user=request.user
                     )
                 ),
                 many=True,
